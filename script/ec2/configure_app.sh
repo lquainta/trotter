@@ -75,7 +75,8 @@ sudo systemctl restart trotter
 
 echo "==> Waiting for Trotter to respond"
 for _ in $(seq 1 30); do
-  if curl -fs http://localhost/up > /dev/null; then
+  # Ask Puma directly: with TLS on, Thruster refuses requests for hosts it doesn't serve, like localhost.
+  if curl -fs http://localhost:3000/up > /dev/null; then
     echo "Trotter is running at http://$(curl -fs https://checkip.amazonaws.com)/"
     exit 0
   fi
