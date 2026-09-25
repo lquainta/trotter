@@ -1,0 +1,11 @@
+<% password_digest = BCrypt::Password.create("password123") %>
+
+rider:
+  username: rider
+  password_digest: <%= password_digest %>
+
+km_rider:
+  username: km_rider
+  password_digest: <%= password_digest %>
+  distance_unit: km
+  theme: dark

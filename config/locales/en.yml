@@ -1,0 +1,13 @@
+# Labels used in validation messages, e.g. "Current password is invalid".
+# To learn more, read the Rails Internationalization guide at https://guides.rubyonrails.org/i18n.html.
+
+en:
+  activerecord:
+    attributes:
+      user:
+        password_challenge: "Current password"
+      activity:
+        started_at: "Start time"
+        duration_hours: "Hours"
+        duration_minutes: "Minutes"
+        duration_seconds: "Seconds"

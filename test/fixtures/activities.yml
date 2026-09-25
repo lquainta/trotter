@@ -1,0 +1,18 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+# Fixtures skip callbacks, so distance_meters is set to what Activity calculates for the route.
+
+boise_loop:
+  user: rider
+  title: Foothills loop
+  description: Easy trot around Camel's Back.
+  started_at: <%= 1.day.ago.to_fs(:db) %>
+  duration: 800
+  distance_meters: 1333.81
+  route_coordinates: [[43.6352, -116.2031], [43.6398, -116.199], [43.6446, -116.1929]]
+
+arena_day:
+  user: km_rider
+  title: Arena schooling
+  started_at: <%= 2.days.ago.to_fs(:db) %>
+  duration: 3000
+  route_coordinates: []

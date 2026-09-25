@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= content_for(:title) || "Trotter" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%# Dark or light scrollbars and form controls. Turbo updates <meta> tags on every visit. %>
+    <meta name="color-scheme" content="<%= { "light" => "light", "dark" => "dark" }.fetch(current_theme, "light dark") %>">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Trotter">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
+    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <%# Leaflet 1.9.4 from the CDN. It must load before the importmap so the global `L` exists when route_maps.js runs. %>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <%# Includes all stylesheet files in app/assets/stylesheets %>
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <%# data-theme goes on <body>, not <html>: Turbo replaces <body> on each visit but never updates <html> attributes. %>
+  <body data-theme="<%= current_theme %>" class="min-h-screen bg-stone-50 text-stone-900 dark:bg-stone-950 dark:text-stone-100">
+    <header class="border-b border-stone-200 bg-white dark:border-stone-800 dark:bg-stone-900">
+      <nav class="mx-auto flex max-w-3xl items-center justify-between gap-4 px-4 py-3">
+        <%= link_to "🐴 Trotter", root_path, class: "text-xl font-bold tracking-tight text-amber-800 dark:text-amber-500" %>
+
+        <div class="flex items-center gap-3 text-sm font-medium sm:gap-4">
+          <%= link_to "Feed", activities_path, class: "text-stone-600 hover:text-stone-900 dark:text-stone-300 dark:hover:text-white" %>
+
+          <% if authenticated? %>
+            <%= link_to "Log a Ride", new_activity_path, class: "rounded-md bg-amber-700 px-3 py-1.5 text-white hover:bg-amber-800" %>
+            <%= link_to user_path(Current.user), title: "Your profile", class: "rounded-full" do %>
+              <%= avatar_for Current.user, size: "size-8 text-sm" %>
+              <span class="sr-only">Your profile</span>
+            <% end %>
+            <%= link_to settings_path, title: "Settings", class: "rounded-md p-1 text-stone-500 hover:bg-stone-100 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-white" do %>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+              </svg>
+              <span class="sr-only">Settings</span>
+            <% end %>
+          <% else %>
+            <%= link_to "Log in", new_session_path, class: "text-stone-600 hover:text-stone-900 dark:text-stone-300 dark:hover:text-white" %>
+            <%= link_to "Sign up", new_registration_path, class: "rounded-md bg-amber-700 px-3 py-1.5 text-white hover:bg-amber-800" %>
+          <% end %>
+        </div>
+      </nav>
+    </header>
+
+    <main class="mx-auto max-w-3xl px-4 py-8">
+      <% if notice %>
+        <p class="mb-6 rounded-md bg-green-50 px-4 py-3 text-sm text-green-800 dark:bg-green-950 dark:text-green-300"><%= notice %></p>
+      <% end %>
+      <% if alert %>
+        <p class="mb-6 rounded-md bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-950 dark:text-red-300"><%= alert %></p>
+      <% end %>
+
+      <%= yield %>
+    </main>
+  </body>
+</html>

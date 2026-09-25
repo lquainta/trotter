@@ -1,0 +1,42 @@
+<% content_for :title, "#{@user.username} · Trotter" %>
+<% own_profile = @user == Current.user %>
+
+<section class="card p-6">
+  <div class="flex flex-wrap items-center gap-4">
+    <%= avatar_for @user, size: "size-16 text-2xl" %>
+    <div>
+      <h1 class="text-2xl font-bold"><%= @user.username %></h1>
+      <p class="text-sm text-stone-500 dark:text-stone-400">Riding since <%= @user.created_at.strftime("%B %Y") %></p>
+    </div>
+    <% if own_profile %>
+      <%= link_to "Settings", settings_path, class: "btn-secondary ml-auto" %>
+    <% end %>
+  </div>
+
+  <dl class="mt-6 grid grid-cols-3 gap-4 border-t border-stone-200 pt-4 dark:border-stone-800">
+    <% { "Rides" => @user.activities.count,
+         "Distance" => format_distance(@user.activities.sum(:distance_meters)),
+         "Time" => format_duration(@user.activities.sum(:duration)) }.each do |label, value| %>
+      <div>
+        <dt class="text-xs text-stone-500 dark:text-stone-400"><%= label %></dt>
+        <dd class="text-xl font-semibold tabular-nums"><%= value %></dd>
+      </div>
+    <% end %>
+  </dl>
+</section>
+
+<h2 class="mt-8 text-lg font-semibold"><%= own_profile ? "Your rides" : "Rides" %></h2>
+
+<% if @activities.empty? %>
+  <p class="mt-4 rounded-lg border border-dashed border-stone-300 px-4 py-10 text-center text-stone-500 dark:border-stone-700 dark:text-stone-400">
+    <% if own_profile %>
+      You haven't logged any rides yet. <%= link_to "Log your first ride", new_activity_path, class: "font-medium text-amber-800 underline dark:text-amber-400" %>.
+    <% else %>
+      <%= @user.username %> hasn't logged any rides yet.
+    <% end %>
+  </p>
+<% end %>
+
+<div class="mt-4 space-y-6">
+  <%= render @activities %>
+</div>

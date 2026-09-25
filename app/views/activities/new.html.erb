@@ -1,0 +1,69 @@
+<% content_for :title, "Log a Ride · Trotter" %>
+
+<h1 class="text-2xl font-bold">Log a Ride</h1>
+
+<%= form_with model: @activity, class: "mt-6 space-y-5" do |form| %>
+  <%= render "shared/form_errors", record: @activity %>
+
+  <div>
+    <%= form.label :title, class: "form-label" %>
+    <%= form.text_field :title, required: true, placeholder: "Morning trot in the foothills", class: "form-input" %>
+  </div>
+
+  <div>
+    <%= form.label :description, class: "form-label" %>
+    <%= form.text_area :description, rows: 3, class: "form-input" %>
+  </div>
+
+  <div class="grid gap-5 sm:grid-cols-2">
+    <div>
+      <%= form.label :started_at, "Date & start time", class: "form-label" %>
+      <%= form.datetime_field :started_at, required: true, include_seconds: false, class: "form-input" %>
+    </div>
+
+    <fieldset>
+      <legend class="form-label">Duration</legend>
+      <div class="mt-1 flex items-center gap-2 text-sm text-stone-500 dark:text-stone-400">
+        <%= form.number_field :duration_hours, min: 0, max: 99, placeholder: "0", aria: { label: "Hours" }, class: "form-input mt-0 w-16" %> h
+        <%= form.number_field :duration_minutes, min: 0, max: 59, placeholder: "0", aria: { label: "Minutes" }, class: "form-input mt-0 w-16" %> m
+        <%= form.number_field :duration_seconds, min: 0, max: 59, placeholder: "0", aria: { label: "Seconds" }, class: "form-input mt-0 w-16" %> s
+      </div>
+    </fieldset>
+  </div>
+
+  <div>
+    <div class="mb-2 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+      <p class="text-sm font-medium text-stone-700 dark:text-stone-300">
+        Route <span class="font-normal text-stone-500 dark:text-stone-400">(click the map to add points)</span>
+      </p>
+      <div class="flex items-center gap-3">
+        <%# route_maps.js updates this as points are added %>
+        <span id="route-distance" data-distance-unit="<%= current_distance_unit %>" class="text-sm font-semibold tabular-nums"></span>
+        <%# type="button" so it doesn't submit the form %>
+        <button type="button" id="undo-last-point" class="btn-secondary px-2.5 py-1 text-xs">Undo Last Point</button>
+      </div>
+    </div>
+
+    <div id="route-draw-map" class="h-96 w-full z-0 rounded-md border border-stone-300 dark:border-stone-700" aria-label="Route map: click to add points"></div>
+
+    <%# route_maps.js keeps this in sync with the drawn route. %>
+    <%= form.hidden_field :route_coordinates, id: "route-coordinates-input", value: @activity.route_coordinates.to_json %>
+  </div>
+
+  <div>
+    <%= form.label :photos, class: "form-label" %>
+    <%= form.file_field :photos, multiple: true, accept: Activity::PHOTO_CONTENT_TYPES.join(","),
+          class: "mt-1 block w-full text-sm text-stone-600 file:mr-4 file:cursor-pointer file:rounded-md file:border-0 file:bg-amber-50
+                  file:px-3 file:py-2 file:font-medium file:text-amber-800 hover:file:bg-amber-100
+                  dark:text-stone-400 dark:file:bg-stone-800 dark:file:text-amber-400 dark:hover:file:bg-stone-700" %>
+    <p class="form-hint">Views from the ride: up to <%= Activity::MAX_PHOTOS %> JPEG, PNG, WebP, or HEIC photos.</p>
+    <% if @activity.errors.any? && @activity.photos.attached? %>
+      <p class="mt-1 text-sm font-medium text-amber-700 dark:text-amber-400">Your photos weren't saved. Please choose them again.</p>
+    <% end %>
+  </div>
+
+  <div class="flex items-center gap-4">
+    <%= form.submit "Save Ride", class: "btn-primary" %>
+    <%= link_to "Cancel", activities_path, class: "text-sm text-stone-600 hover:text-stone-900 dark:text-stone-400 dark:hover:text-white" %>
+  </div>
+<% end %>

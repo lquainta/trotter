@@ -1,0 +1,20 @@
+<% content_for :title, "Feed · Trotter" %>
+
+<% unless authenticated? %>
+  <div class="card mb-6 flex flex-wrap items-center justify-between gap-4 p-4">
+    <p class="text-stone-600 dark:text-stone-300">Track your rides, see where everyone's been riding, and share the views.</p>
+    <%= link_to "Join Trotter", new_registration_path, class: "btn-primary" %>
+  </div>
+<% end %>
+
+<h1 class="text-2xl font-bold">Feed</h1>
+
+<% if @activities.empty? %>
+  <p class="mt-6 rounded-lg border border-dashed border-stone-300 px-4 py-10 text-center text-stone-500 dark:border-stone-700 dark:text-stone-400">
+    No rides yet. <%= link_to "Log your first ride", new_activity_path, class: "font-medium text-amber-800 underline dark:text-amber-400" %>.
+  </p>
+<% end %>
+
+<div class="mt-6 space-y-6">
+  <%= render @activities %>
+</div>

@@ -1,0 +1,23 @@
+<% content_for :title, "Log in · Trotter" %>
+
+<div class="mx-auto max-w-sm">
+  <h1 class="text-2xl font-bold">Log in</h1>
+
+  <%= form_with url: session_path, class: "mt-6 space-y-4" do |form| %>
+    <div>
+      <%= form.label :username, class: "form-label" %>
+      <%= form.text_field :username, required: true, autofocus: true, autocomplete: "username", class: "form-input" %>
+    </div>
+
+    <div>
+      <%= form.label :password, class: "form-label" %>
+      <%= form.password_field :password, required: true, autocomplete: "current-password", maxlength: 72, class: "form-input" %>
+    </div>
+
+    <%= form.submit "Log in", class: "btn-primary w-full" %>
+  <% end %>
+
+  <p class="mt-6 text-center text-sm text-stone-600 dark:text-stone-400">
+    New to Trotter? <%= link_to "Create an account", new_registration_path, class: "font-medium text-amber-800 underline dark:text-amber-400" %>
+  </p>
+</div>

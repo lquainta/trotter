@@ -1,0 +1,70 @@
+<% content_for :title, "Settings · Trotter" %>
+<% option_classes = "flex cursor-pointer items-center justify-center rounded-md border border-stone-300 px-3 py-2 text-sm font-medium
+                     has-checked:border-amber-600 has-checked:bg-amber-50 has-checked:text-amber-900 has-focus-visible:ring-2 has-focus-visible:ring-amber-600
+                     dark:border-stone-700 dark:has-checked:border-amber-500 dark:has-checked:bg-amber-950 dark:has-checked:text-amber-200" %>
+
+<h1 class="text-2xl font-bold">Settings</h1>
+
+<section class="card mt-6 p-6">
+  <h2 class="text-lg font-semibold">Preferences</h2>
+
+  <%= form_with model: Current.user, url: settings_path, method: :patch, class: "mt-4 space-y-6" do |form| %>
+    <fieldset>
+      <legend class="form-label">Appearance</legend>
+      <div class="mt-2 grid grid-cols-3 gap-3">
+        <% { "light" => "Light", "dark" => "Dark", "system" => "System" }.each do |value, label| %>
+          <label class="<%= option_classes %>">
+            <%= form.radio_button :theme, value, class: "sr-only" %> <%= label %>
+          </label>
+        <% end %>
+      </div>
+      <p class="form-hint">System matches your device's light or dark setting.</p>
+    </fieldset>
+
+    <fieldset>
+      <legend class="form-label">Distance units</legend>
+      <div class="mt-2 grid grid-cols-2 gap-3 sm:w-2/3">
+        <% { "mi" => "Miles", "km" => "Kilometers" }.each do |value, label| %>
+          <label class="<%= option_classes %>">
+            <%= form.radio_button :distance_unit, value, class: "sr-only" %> <%= label %>
+          </label>
+        <% end %>
+      </div>
+    </fieldset>
+
+    <%= form.submit "Save preferences", class: "btn-primary" %>
+  <% end %>
+</section>
+
+<section class="card mt-6 p-6">
+  <h2 class="text-lg font-semibold">Change password</h2>
+
+  <%= form_with model: Current.user, url: settings_password_path, method: :patch, class: "mt-4 space-y-4 sm:w-2/3" do |form| %>
+    <%= render "shared/form_errors", record: Current.user %>
+
+    <div>
+      <%= form.label :password_challenge, "Current password", class: "form-label" %>
+      <%= form.password_field :password_challenge, required: true, autocomplete: "current-password", maxlength: 72, class: "form-input" %>
+    </div>
+
+    <div>
+      <%= form.label :password, "New password", class: "form-label" %>
+      <%= form.password_field :password, required: true, autocomplete: "new-password", minlength: 8, maxlength: 72, class: "form-input" %>
+    </div>
+
+    <div>
+      <%= form.label :password_confirmation, "Confirm new password", class: "form-label" %>
+      <%= form.password_field :password_confirmation, required: true, autocomplete: "new-password", maxlength: 72, class: "form-input" %>
+    </div>
+
+    <%= form.submit "Change password", class: "btn-primary" %>
+  <% end %>
+</section>
+
+<section class="card mt-6 p-6">
+  <h2 class="text-lg font-semibold">Account</h2>
+  <p class="mt-1 text-sm text-stone-600 dark:text-stone-400">
+    Logged in as <%= link_to Current.user.username, user_path(Current.user), class: "font-medium underline" %>.
+  </p>
+  <%= button_to "Log out", session_path, method: :delete, class: "btn-secondary mt-4" %>
+</section>
