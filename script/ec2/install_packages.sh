@@ -18,7 +18,7 @@ apt-get install -y --no-install-recommends \
   build-essential pkg-config \
   libssl-dev libreadline-dev zlib1g-dev libyaml-dev libffi-dev libgmp-dev \
   sqlite3 libsqlite3-dev \
-  libvips
+  libvips libheif-plugin-libde265 # libheif only suggests the HEVC decoder iPhone HEIC photos need
 
 echo "==> Adding 2 GB of swap so small instances can compile Ruby"
 if ! swapon --show | grep -q '^/swapfile'; then
