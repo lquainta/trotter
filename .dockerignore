@@ -49,3 +49,6 @@
 # Ignore Docker-related files
 /.dockerignore
 /Dockerfile*
+
+# Private keys, such as the EC2 SSH key.
+**/*.pem

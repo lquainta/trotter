@@ -36,3 +36,9 @@
 
 /app/assets/builds/*
 !/app/assets/builds/.keep
+
+# Private keys, such as the EC2 SSH key.
+*.pem
+
+# Environment files in any folder.
+.env*
