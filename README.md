@@ -47,6 +47,8 @@ cd trotter
 
 For development with automatic CSS rebuilding, use `bin/dev` instead.
 
+**Until launch, the site only shows a "Hello World" page**, and every other URL returns 404. To run the full app, set `TROTTER_SHOW_APP=true` (for example `TROTTER_SHOW_APP=true ./start.sh`). On the server, add `TROTTER_SHOW_APP=true` to `/etc/trotter.env` and restart. The tests always run against the full app.
+
 ## Tests
 
 ```bash

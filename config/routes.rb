@@ -1,13 +1,5 @@
 Rails.application.routes.draw do
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
-  resource :session, only: %i[ new create destroy ]
-  resource :registration, only: %i[ new create ]
-  resources :users, only: :show, param: :username
-  resource :settings, only: %i[ show update ]
-  namespace :settings do
-    resource :password, only: :update
-  end
-  resources :activities, only: %i[ index new create ]
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
@@ -18,6 +10,20 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
-  # Defines the root path route ("/")
-  root "activities#index"
+  # The full app is hidden until launch (see config.x.show_app in config/application.rb);
+  # until then every other URL is a 404.
+  if Rails.configuration.x.show_app
+    resource :session, only: %i[ new create destroy ]
+    resource :registration, only: %i[ new create ]
+    resources :users, only: :show, param: :username
+    resource :settings, only: %i[ show update ]
+    namespace :settings do
+      resource :password, only: :update
+    end
+    resources :activities, only: %i[ index new create ]
+
+    root "activities#index"
+  else
+    root "pages#hello"
+  end
 end

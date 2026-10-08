@@ -10,6 +10,9 @@
 #   ./start.sh --port 4000  listen somewhere other than port 3000
 #   ./start.sh --help       show this message
 #
+# Until launch the site is a single "Hello World" page. To run the full app:
+#   TROTTER_SHOW_APP=true ./start.sh
+#
 # This is for development. On the EC2 server, systemd starts the app instead --
 # see deploy/setup-ec2.sh and deploy/trotter.service.
 #
@@ -116,7 +119,9 @@ bin/rails tailwindcss:build
 # --- start ------------------------------------------------------------------
 
 say "Starting Trotter on http://localhost:${PORT} -- press Ctrl+C to stop"
-say "Sample login: username demo, password password123"
+if [ "${TROTTER_SHOW_APP:-}" = "true" ]; then
+    say "Sample login: username demo, password password123"
+fi
 
 # exec replaces this shell with the server, so Ctrl+C reaches it directly.
 exec bin/rails server --port "$PORT"
