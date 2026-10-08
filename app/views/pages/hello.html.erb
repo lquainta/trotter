@@ -6,8 +6,258 @@
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+
+      html, body { height: 100%; overflow: hidden; }
+
+      body {
+        background: radial-gradient(ellipse at 50% 120%, #ff2bd6 0%, #7b1fa2 30%, #1a0638 60%, #05010f 100%);
+        color: #fff;
+        font-family: "Trebuchet MS", "Arial Black", system-ui, sans-serif;
+        cursor: crosshair;
+      }
+
+      /* ---- stars ---- */
+      .stars { position: fixed; inset: 0; pointer-events: none; }
+      .star {
+        position: absolute; width: 2px; height: 2px; border-radius: 50%; background: #fff;
+        animation: twinkle var(--t) ease-in-out infinite alternate;
+      }
+      @keyframes twinkle { from { opacity: .15; } to { opacity: 1; box-shadow: 0 0 6px #fff; } }
+
+      /* ---- synthwave sun ---- */
+      .sun {
+        position: fixed; left: 50%; bottom: 38vh; width: 38vmin; height: 38vmin; translate: -50% 50%;
+        border-radius: 50%;
+        background: linear-gradient(#ffe259 0%, #ff8c42 45%, #ff2bd6 100%);
+        box-shadow: 0 0 60px #ff2bd6, 0 0 140px #ff8c42;
+        /* Solid top half, horizontal stripes on the bottom half, like an 80s sunset. */
+        mask: linear-gradient(#000 0 52%, transparent 52%), repeating-linear-gradient(#000 0 9px, transparent 9px 14px);
+        mask-composite: add;
+        animation: sunpulse 4s ease-in-out infinite;
+      }
+      @keyframes sunpulse { 50% { box-shadow: 0 0 90px #ff2bd6, 0 0 200px #ffb347; } }
+
+      /* ---- retro grid floor ---- */
+      .floor {
+        position: fixed; left: -50%; right: -50%; bottom: 0; height: 40vh;
+        background:
+          linear-gradient(transparent 0 96%, #ff2bd6 96%) 0 0 / 100% 40px,
+          linear-gradient(90deg, transparent 0 97%, #00f0ff 97%) 0 0 / 60px 100%;
+        transform: perspective(300px) rotateX(60deg);
+        transform-origin: bottom;
+        animation: drive 1.2s linear infinite;
+        filter: drop-shadow(0 0 4px #ff2bd6);
+        opacity: .85;
+      }
+      .floor::after {
+        content: ""; position: absolute; inset: 0;
+        background: linear-gradient(#05010f 0%, transparent 60%);
+      }
+      @keyframes drive { to { background-position: 0 40px, 0 0; } }
+
+      /* ---- sweeping spotlights ---- */
+      .beam {
+        position: fixed; bottom: -10vh; width: 18vmax; height: 140vh; pointer-events: none;
+        background: linear-gradient(to top, var(--c), transparent 85%);
+        clip-path: polygon(45% 100%, 55% 100%, 100% 0, 0 0);
+        mix-blend-mode: screen; opacity: .35; filter: blur(6px);
+        transform-origin: 50% 100%;
+        animation: sweep var(--d) ease-in-out infinite alternate;
+      }
+      .beam.b1 { left: 8%;  --c: #00f0ff; --d: 5s; }
+      .beam.b2 { left: 42%; --c: #ff2bd6; --d: 6.5s; animation-delay: -2s; }
+      .beam.b3 { right: 8%; --c: #b6ff00; --d: 5.8s; animation-delay: -4s; }
+      @keyframes sweep { from { rotate: -28deg; } to { rotate: 28deg; } }
+
+      /* ---- neon headline ---- */
+      .stage {
+        position: fixed; inset: 0; display: grid; place-items: center; pointer-events: none;
+      }
+      h1 {
+        font-size: clamp(3rem, 12vw, 10rem); font-weight: 900; letter-spacing: .06em; text-transform: uppercase;
+        text-align: center; line-height: 1; translate: 0 -8vh;
+        color: #fff6fe;
+        text-shadow:
+          0 0 4px #fff, 0 0 10px #ff2bd6, 0 0 22px #ff2bd6, 0 0 44px #ff2bd6,
+          0 0 80px #b400ff, 0 0 120px #b400ff;
+        animation: flicker 5s infinite, hue 12s linear infinite, float 3s ease-in-out infinite;
+      }
+      @keyframes flicker {
+        0%, 18%, 22%, 25%, 53%, 57%, 100% { opacity: 1; }
+        20%, 24%, 55% { opacity: .35; text-shadow: none; }
+      }
+      @keyframes hue { to { filter: hue-rotate(360deg); } }
+      @keyframes float { 50% { translate: 0 -10vh; } }
+
+      /* ---- bouncing things ---- */
+      .bouncer { position: fixed; left: 0; top: 0; will-change: transform; pointer-events: none; }
+      .shape {
+        width: 54px; height: 54px; display: grid; place-items: center;
+        font-size: 40px; line-height: 1;
+        color: var(--glow);
+        text-shadow: 0 0 8px var(--glow), 0 0 22px var(--glow), 0 0 40px var(--glow);
+        animation: spin 4s linear infinite;
+      }
+      @keyframes spin { to { rotate: 360deg; } }
+
+      /* ---- the cat ---- */
+      .cat { width: 170px; height: 190px; filter: drop-shadow(0 0 14px #00f0ff) drop-shadow(0 0 30px #ff2bd6); }
+      .cat svg { width: 100%; height: 100%; overflow: visible; }
+      .cat .dance { transform-box: fill-box; transform-origin: 50% 100%; animation: groove .5s ease-in-out infinite alternate; }
+      .cat .head  { transform-box: fill-box; transform-origin: 50% 90%; animation: bob .25s ease-in-out infinite alternate; }
+      .cat .arm-l { transform-box: fill-box; transform-origin: 90% 10%; animation: wave-l .5s ease-in-out infinite alternate; }
+      .cat .arm-r { transform-box: fill-box; transform-origin: 10% 10%; animation: wave-r .5s ease-in-out infinite alternate; }
+      .cat .tail  { transform-box: fill-box; transform-origin: 0% 100%; animation: wag .4s ease-in-out infinite alternate; }
+      .cat .shine { animation: shine 1.6s linear infinite; }
+      @keyframes groove { from { rotate: -10deg; } to { rotate: 10deg; } }
+      @keyframes bob    { from { translate: 0 0; rotate: -6deg; } to { translate: 0 -5px; rotate: 6deg; } }
+      @keyframes wave-l { from { rotate: 20deg; } to { rotate: -60deg; } }
+      @keyframes wave-r { from { rotate: 60deg; } to { rotate: -20deg; } }
+      @keyframes wag    { from { rotate: -25deg; } to { rotate: 25deg; } }
+      @keyframes shine  { 0%, 60% { translate: -30px 0; opacity: 0; } 70% { opacity: 1; } 100% { translate: 30px 0; opacity: 0; } }
+
+      /* ---- click sparks ---- */
+      .spark {
+        position: fixed; width: 8px; height: 8px; border-radius: 50%; pointer-events: none;
+        background: var(--c); box-shadow: 0 0 10px var(--c), 0 0 20px var(--c);
+        animation: burst .9s ease-out forwards;
+      }
+      @keyframes burst { to { translate: var(--dx) var(--dy); scale: 0; opacity: 0; } }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { animation: none !important; }
+      }
+    </style>
   </head>
   <body>
-    <h1>Hello World</h1>
+    <div class="stars" id="stars"></div>
+    <div class="sun"></div>
+    <div class="floor"></div>
+    <div class="beam b1"></div>
+    <div class="beam b2"></div>
+    <div class="beam b3"></div>
+
+    <main class="stage">
+      <h1>Hello World</h1>
+    </main>
+
+    <div class="bouncer cat" id="cat" aria-hidden="true">
+      <svg viewBox="0 0 170 190">
+        <g class="dance">
+          <path class="tail" d="M118 150 q34 -10 30 -50" fill="none" stroke="#ff9f43" stroke-width="12" stroke-linecap="round"/>
+          <ellipse cx="85" cy="145" rx="38" ry="42" fill="#ff9f43"/>
+          <ellipse cx="85" cy="152" rx="22" ry="28" fill="#ffd8a8"/>
+          <path class="arm-l" d="M52 125 q-22 -6 -30 -30" fill="none" stroke="#ff9f43" stroke-width="12" stroke-linecap="round"/>
+          <path class="arm-r" d="M118 125 q22 -6 30 -30" fill="none" stroke="#ff9f43" stroke-width="12" stroke-linecap="round"/>
+          <ellipse cx="66" cy="186" rx="14" ry="7" fill="#ff9f43"/>
+          <ellipse cx="104" cy="186" rx="14" ry="7" fill="#ff9f43"/>
+          <g class="head">
+            <polygon points="40,52 52,10 76,40" fill="#ff9f43"/>
+            <polygon points="130,52 118,10 94,40" fill="#ff9f43"/>
+            <polygon points="48,46 54,22 68,40" fill="#ff6fb5"/>
+            <polygon points="122,46 116,22 102,40" fill="#ff6fb5"/>
+            <circle cx="85" cy="68" r="44" fill="#ff9f43"/>
+            <!-- sunglasses -->
+            <rect x="44" y="52" width="36" height="22" rx="8" fill="#111"/>
+            <rect x="90" y="52" width="36" height="22" rx="8" fill="#111"/>
+            <rect x="78" y="58" width="14" height="5" fill="#111"/>
+            <line x1="44" y1="58" x2="38" y2="54" stroke="#111" stroke-width="4"/>
+            <line x1="126" y1="58" x2="132" y2="54" stroke="#111" stroke-width="4"/>
+            <clipPath id="lenses"><rect x="44" y="52" width="36" height="22" rx="8"/><rect x="90" y="52" width="36" height="22" rx="8"/></clipPath>
+            <g clip-path="url(#lenses)"><rect class="shine" x="60" y="40" width="10" height="50" fill="#fff" opacity=".7" transform="skewX(-20)"/></g>
+            <!-- face -->
+            <path d="M80 84 l5 5 l5 -5 z" fill="#ff6fb5"/>
+            <path d="M72 92 q13 12 26 0" fill="none" stroke="#5a2d0c" stroke-width="3" stroke-linecap="round"/>
+            <line x1="40" y1="86" x2="62" y2="88" stroke="#5a2d0c" stroke-width="2"/>
+            <line x1="40" y1="94" x2="62" y2="92" stroke="#5a2d0c" stroke-width="2"/>
+            <line x1="130" y1="86" x2="108" y2="88" stroke="#5a2d0c" stroke-width="2"/>
+            <line x1="130" y1="94" x2="108" y2="92" stroke="#5a2d0c" stroke-width="2"/>
+          </g>
+        </g>
+      </svg>
+    </div>
+
+    <script>
+      (() => {
+        const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches
+        const neon = ["#ff2bd6", "#00f0ff", "#b6ff00", "#ffe259", "#ff8c42", "#b400ff"]
+        const pick = (list) => list[Math.floor(Math.random() * list.length)]
+
+        // Twinkling stars
+        const stars = document.getElementById("stars")
+        for (let i = 0; i < 120; i++) {
+          const star = document.createElement("div")
+          star.className = "star"
+          star.style.left = `${Math.random() * 100}%`
+          star.style.top = `${Math.random() * 60}%`
+          star.style.setProperty("--t", `${1 + Math.random() * 3}s`)
+          stars.appendChild(star)
+        }
+
+        // Bouncing neon shapes, plus the cat
+        const bouncers = []
+        const addBouncer = (element, speed) => {
+          const angle = Math.random() * Math.PI * 2
+          bouncers.push({
+            element,
+            x: Math.random() * (innerWidth - 120),
+            y: Math.random() * (innerHeight - 120),
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+          })
+        }
+        for (const glyph of ["★", "▲", "●", "◆", "✦", "♥", "⬢", "✚"]) {
+          const wrapper = document.createElement("div")
+          wrapper.className = "bouncer"
+          wrapper.setAttribute("aria-hidden", "true")
+          const shape = document.createElement("div")
+          shape.className = "shape"
+          shape.textContent = glyph
+          shape.style.setProperty("--glow", pick(neon))
+          wrapper.appendChild(shape)
+          document.body.appendChild(wrapper)
+          addBouncer(wrapper, 2 + Math.random() * 2.5)
+        }
+        addBouncer(document.getElementById("cat"), 2.4)
+
+        const tick = () => {
+          for (const b of bouncers) {
+            const w = b.element.offsetWidth, h = b.element.offsetHeight
+            b.x += b.vx
+            b.y += b.vy
+            let bounced = false
+            if (b.x <= 0 || b.x + w >= innerWidth) { b.vx *= -1; b.x = Math.max(0, Math.min(b.x, innerWidth - w)); bounced = true }
+            if (b.y <= 0 || b.y + h >= innerHeight) { b.vy *= -1; b.y = Math.max(0, Math.min(b.y, innerHeight - h)); bounced = true }
+            if (bounced) {
+              const shape = b.element.querySelector(".shape")
+              if (shape) shape.style.setProperty("--glow", pick(neon))
+            }
+            b.element.style.transform = `translate(${b.x}px, ${b.y}px)`
+          }
+          if (!reduceMotion) requestAnimationFrame(tick)
+        }
+        tick()
+
+        // Click anywhere for a neon burst
+        addEventListener("pointerdown", (event) => {
+          if (reduceMotion) return
+          for (let i = 0; i < 24; i++) {
+            const spark = document.createElement("div")
+            spark.className = "spark"
+            const angle = (i / 24) * Math.PI * 2
+            const distance = 60 + Math.random() * 90
+            spark.style.left = `${event.clientX}px`
+            spark.style.top = `${event.clientY}px`
+            spark.style.setProperty("--c", pick(neon))
+            spark.style.setProperty("--dx", `${Math.cos(angle) * distance}px`)
+            spark.style.setProperty("--dy", `${Math.sin(angle) * distance}px`)
+            document.body.appendChild(spark)
+            spark.addEventListener("animationend", () => spark.remove())
+          }
+        })
+      })()
+    </script>
   </body>
 </html>
