@@ -1,0 +1,45 @@
+# The systemd unit that runs Trotter. systemd starts it on boot and restarts it
+# if it crashes, so the app keeps running after you close your SSH session.
+#
+# setup-ec2.sh copies this to /etc/systemd/system/trotter.service.
+# Useful commands once it's installed:
+#   sudo systemctl status trotter     # is it running?
+#   sudo systemctl restart trotter    # restart after a deploy
+#   journalctl -u trotter -f          # follow the logs
+[Unit]
+Description=Trotter (Rails app)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+
+# The login user owns the code (deploy.sh rsyncs into /opt/trotter as this
+# user) and has Ruby installed through rbenv in its home directory.
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/opt/trotter
+
+# SECRET_KEY_BASE, created by setup-ec2.sh.
+EnvironmentFile=/etc/trotter.env
+Environment=PATH=/home/ubuntu/.rbenv/shims:/home/ubuntu/.rbenv/bin:/usr/local/bin:/usr/bin:/bin
+Environment=RAILS_ENV=production
+# Puma listens on port 3000; nginx forwards ports 80 and 443 to it.
+Environment=PORT=3000
+# Runs background jobs (photo analysis and cleanup) inside Puma.
+Environment=SOLID_QUEUE_IN_PUMA=true
+
+ExecStart=/home/ubuntu/.rbenv/shims/bundle exec bin/rails server
+
+# If the app crashes, start it again after 5 seconds.
+Restart=always
+RestartSec=5
+
+StandardOutput=journal
+StandardError=journal
+
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

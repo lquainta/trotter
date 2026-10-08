@@ -21,32 +21,31 @@ A Strava-style ride tracker for horses and their riders. Draw your route on a ma
 | Frontend | ERB views, Hotwire (Turbo), import maps, Tailwind CSS 4 |
 | Maps | Leaflet 1.9.4 with OpenStreetMap tiles |
 | Photos | Active Storage + libvips |
-| Web server | Puma behind Thruster (HTTPS via Let's Encrypt) |
+| Web server | Puma behind nginx (HTTPS via Let's Encrypt and certbot) |
 | Hosting | AWS EC2, Ubuntu 24.04 |
 
-## Running it locally (macOS)
+## Running it locally
 
-You'll need [Homebrew](https://brew.sh), Git, and Google Chrome (for the browser tests).
+**Step 1: install these tools first.**
+
+| Tool | Ubuntu / Debian | macOS |
+|---|---|---|
+| Ruby 3.3 or newer | [rbenv and ruby-build from git](https://github.com/rbenv/rbenv#basic-git-checkout), then `rbenv install 3.3.5` (Ubuntu's packaged Ruby and ruby-build are too old) | `brew install rbenv ruby-build`, then `rbenv install 3.3.5` |
+| C compiler and make | `sudo apt install build-essential libyaml-dev libssl-dev libffi-dev` | `xcode-select --install` |
+| libvips (photo resizing) | `sudo apt install libvips-tools libheif-plugin-libde265` | `brew install vips` |
+| Google Chrome (browser tests only) | from google.com/chrome | from google.com/chrome |
+
+**Step 2: run it.**
 
 ```bash
-# Ruby 3.3.5 and libvips (for photos)
-brew install rbenv ruby-build vips
-echo 'eval "$(rbenv init - zsh)"' >> ~/.zshrc   # then open a new terminal
-rbenv install 3.3.5
-
-# Get the code, install gems, and create the database
 git clone https://github.com/lquainta/trotter.git
 cd trotter
-bin/setup --skip-server
-
-# Optional: demo riders and rides (every demo password is "password123")
-bin/rails db:seed
-
-# Start the app at http://localhost:3000
-bin/dev
+./start.sh
 ```
 
-`bin/dev` runs the Rails server plus a Tailwind watcher that rebuilds the CSS when views change.
+`start.sh` checks the tools above, installs the Ruby gems, creates the SQLite database with sample riders and rides, builds the CSS, and starts the app at **http://localhost:3000**. It's safe to run again. Log in as `demo` with password `password123`. Use `./start.sh --port 4000` for another port.
+
+For development with automatic CSS rebuilding, use `bin/dev` instead.
 
 ## Tests
 
@@ -63,38 +62,39 @@ GitHub Actions runs all of these on every push and pull request (`.github/workfl
 
 ## Deploying to AWS EC2
 
-Two scripts in `script/ec2/` set up a fresh **Ubuntu 24.04** instance. The security group needs ports 22, 80, and 443 open.
+The `deploy/` folder holds everything for an Ubuntu 24.04 instance (the security group needs ports 22, 80 and 443 open):
+
+| File | What it does |
+|---|---|
+| `deploy/setup-ec2.sh` | One-time server setup, run on the server with sudo: Ruby (via rbenv), libvips, nginx, `/opt/trotter`, and the systemd service |
+| `deploy/trotter.service` | The systemd unit that starts Trotter on boot and restarts it if it crashes |
+| `deploy/nginx-trotter.conf`, `deploy/nginx-trotter-proxy.conf` | nginx forwards ports 80/443 to Puma on port 3000 |
+| `deploy/deploy.sh` | Run from your laptop: tests, copies the code with rsync, installs gems, migrates, restarts, and checks `/api/health` |
+
+**One-time server setup** (compiling Ruby takes 20-30 minutes on a t2.micro):
 
 ```bash
-ssh -i your-key.pem ubuntu@<public-ip>
-curl -fsSLO https://github.com/lquainta/trotter/raw/main/script/ec2/install_packages.sh
-curl -fsSLO https://github.com/lquainta/trotter/raw/main/script/ec2/configure_app.sh
-sudo bash install_packages.sh   # system packages, 2 GB swap, rbenv + Ruby (slow on a t2.micro)
-bash configure_app.sh           # clones the app, sets up the database and assets, starts it on boot
+scp -i landonquaintance-cs408.pem -r deploy ubuntu@<PUBLIC-IP>:~
+ssh -i landonquaintance-cs408.pem ubuntu@<PUBLIC-IP>
+sudo bash deploy/setup-ec2.sh --https   # --https: Let's Encrypt for trotter-app.com (DNS must point at the server)
 ```
 
-`configure_app.sh` creates `/etc/trotter.env` with a new `SECRET_KEY_BASE` and installs a `trotter` systemd service, so the app starts on every boot and restarts if it crashes.
-
-### HTTPS
-
-Point your domain's `A` records (`@` and `www`) at the instance, then:
+**Deploy** (from your laptop, every time you want the server to have your latest code):
 
 ```bash
-echo 'TLS_DOMAIN=trotter-app.com,www.trotter-app.com' | sudo tee -a /etc/trotter.env
-sudo systemctl restart trotter
+./deploy/deploy.sh -h <PUBLIC-IP> -i landonquaintance-cs408.pem
 ```
 
-Thruster gets and renews Let's Encrypt certificates automatically. The public IP changes if the instance is *stopped*, so keep EC2 stop protection on (reboots are fine).
+The site is then at `http://<PUBLIC-IP>/` and https://trotter-app.com. The database and uploaded photos live in `/opt/trotter/storage` on the server and are never overwritten by a deploy. The public IP changes if the instance is *stopped*, so keep EC2 stop protection on (reboots are fine).
 
 ### Everyday commands (on the server)
 
 | Task | Command |
 |---|---|
-| Deploy new code | `bash ~/trotter/script/ec2/configure_app.sh` (run it twice if the push changed the script itself) |
-| Add demo data | `SEED_DEMO_DATA=true bash ~/trotter/script/ec2/configure_app.sh` |
 | Status / logs | `systemctl status trotter` / `journalctl -u trotter -f` |
 | Restart | `sudo systemctl restart trotter` |
-| Health check | `curl http://localhost:3000/up` |
+| Health check | `curl http://localhost/api/health` |
+| Rails console | `cd /opt/trotter && set -a && . /etc/trotter.env && set +a && RAILS_ENV=production bin/rails console` |
 
 ## Credits
 
