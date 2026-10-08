@@ -21,10 +21,10 @@
       /* ---- stars ---- */
       .stars { position: fixed; inset: 0; pointer-events: none; }
       .star {
-        position: absolute; width: 2px; height: 2px; border-radius: 50%; background: #fff;
+        position: absolute; width: 2px; height: 2px; border-radius: 50%; background: #fff; box-shadow: 0 0 4px #fff;
         animation: twinkle var(--t) ease-in-out infinite alternate;
       }
-      @keyframes twinkle { from { opacity: .15; } to { opacity: 1; box-shadow: 0 0 6px #fff; } }
+      @keyframes twinkle { from { opacity: .15; } to { opacity: 1; } }
 
       /* ---- synthwave sun ---- */
       .sun {
@@ -35,34 +35,37 @@
         /* Solid top half, horizontal stripes on the bottom half, like an 80s sunset. */
         mask: linear-gradient(#000 0 52%, transparent 52%), repeating-linear-gradient(#000 0 9px, transparent 9px 14px);
         mask-composite: add;
-        animation: sunpulse 4s ease-in-out infinite;
       }
-      @keyframes sunpulse { 50% { box-shadow: 0 0 90px #ff2bd6, 0 0 200px #ffb347; } }
 
       /* ---- retro grid floor ---- */
       .floor {
         position: fixed; left: -50%; right: -50%; bottom: 0; height: 40vh;
-        background:
-          linear-gradient(transparent 0 96%, #ff2bd6 96%) 0 0 / 100% 40px,
-          linear-gradient(90deg, transparent 0 97%, #00f0ff 97%) 0 0 / 60px 100%;
         transform: perspective(300px) rotateX(60deg);
         transform-origin: bottom;
+        overflow: hidden;
+        opacity: .9;
+      }
+      .floor .grid {
+        position: absolute; left: 0; right: 0; top: -40px; bottom: 0;
+        background:
+          linear-gradient(transparent 0 94%, #ff2bd6 94%) 0 0 / 100% 40px,
+          linear-gradient(90deg, transparent 0 96%, #00f0ff 96%) 0 0 / 60px 100%;
         animation: drive 1.2s linear infinite;
-        filter: drop-shadow(0 0 4px #ff2bd6);
-        opacity: .85;
+        will-change: transform;
       }
       .floor::after {
         content: ""; position: absolute; inset: 0;
         background: linear-gradient(#05010f 0%, transparent 60%);
       }
-      @keyframes drive { to { background-position: 0 40px, 0 0; } }
+      @keyframes drive { to { transform: translateY(40px); } }
 
       /* ---- sweeping spotlights ---- */
       .beam {
         position: fixed; bottom: -10vh; width: 18vmax; height: 140vh; pointer-events: none;
         background: linear-gradient(to top, var(--c), transparent 85%);
         clip-path: polygon(45% 100%, 55% 100%, 100% 0, 0 0);
-        mix-blend-mode: screen; opacity: .35; filter: blur(6px);
+        opacity: .3;
+        will-change: transform;
         transform-origin: 50% 100%;
         animation: sweep var(--d) ease-in-out infinite alternate;
       }
@@ -82,13 +85,13 @@
         text-shadow:
           0 0 4px #fff, 0 0 10px #ff2bd6, 0 0 22px #ff2bd6, 0 0 44px #ff2bd6,
           0 0 80px #b400ff, 0 0 120px #b400ff;
-        animation: flicker 5s infinite, hue 12s linear infinite, float 3s ease-in-out infinite;
+        animation: flicker 5s infinite, float 3s ease-in-out infinite;
+        will-change: transform, opacity;
       }
       @keyframes flicker {
         0%, 18%, 22%, 25%, 53%, 57%, 100% { opacity: 1; }
         20%, 24%, 55% { opacity: .35; text-shadow: none; }
       }
-      @keyframes hue { to { filter: hue-rotate(360deg); } }
       @keyframes float { 50% { translate: 0 -10vh; } }
 
       /* ---- bouncing things ---- */
@@ -99,11 +102,16 @@
         color: var(--glow);
         text-shadow: 0 0 8px var(--glow), 0 0 22px var(--glow), 0 0 40px var(--glow);
         animation: spin 4s linear infinite;
+        will-change: transform;
       }
       @keyframes spin { to { rotate: 360deg; } }
 
       /* ---- the horse ---- */
-      .horse { width: 170px; height: 190px; filter: drop-shadow(0 0 14px #00f0ff) drop-shadow(0 0 30px #ff2bd6); }
+      .horse { width: 170px; height: 190px; }
+      .horse::before {
+        content: ""; position: absolute; inset: -18%; border-radius: 50%; z-index: -1;
+        background: radial-gradient(closest-side, rgba(0, 240, 255, .55), rgba(255, 43, 214, .35) 55%, transparent);
+      }
       .horse svg { width: 100%; height: 100%; overflow: visible; }
       .horse .dance { transform-box: fill-box; transform-origin: 50% 100%; animation: groove .5s ease-in-out infinite alternate; }
       .horse .head  { transform-box: fill-box; transform-origin: 50% 90%; animation: bob .25s ease-in-out infinite alternate; }
@@ -134,7 +142,7 @@
   <body>
     <div class="stars" id="stars"></div>
     <div class="sun"></div>
-    <div class="floor"></div>
+    <div class="floor"><div class="grid"></div></div>
     <div class="beam b1"></div>
     <div class="beam b2"></div>
     <div class="beam b3"></div>
@@ -215,10 +223,12 @@
 
         // Bouncing neon shapes, plus the horse
         const bouncers = []
+        // speed is in pixels per second, so motion stays steady even when frames are dropped.
         const addBouncer = (element, speed) => {
           const angle = Math.random() * Math.PI * 2
           bouncers.push({
             element,
+            w: 0, h: 0,
             x: Math.random() * (innerWidth - 120),
             y: Math.random() * (innerHeight - 120),
             vx: Math.cos(angle) * speed,
@@ -235,15 +245,23 @@
           shape.style.setProperty("--glow", pick(neon))
           wrapper.appendChild(shape)
           document.body.appendChild(wrapper)
-          addBouncer(wrapper, 2 + Math.random() * 2.5)
+          addBouncer(wrapper, 120 + Math.random() * 150)
         }
-        addBouncer(document.getElementById("horse"), 2.4)
+        addBouncer(document.getElementById("horse"), 145)
 
-        const tick = () => {
+        const measure = () => bouncers.forEach((b) => { b.w = b.element.offsetWidth; b.h = b.element.offsetHeight })
+        measure()
+        addEventListener("resize", measure)
+
+        let last = performance.now()
+        const tick = (now = performance.now()) => {
+          // Seconds since the last frame, capped so a background tab doesn't teleport everything.
+          const dt = Math.min((now - last) / 1000, 0.05)
+          last = now
           for (const b of bouncers) {
-            const w = b.element.offsetWidth, h = b.element.offsetHeight
-            b.x += b.vx
-            b.y += b.vy
+            const w = b.w, h = b.h
+            b.x += b.vx * dt
+            b.y += b.vy * dt
             let bounced = false
             if (b.x <= 0 || b.x + w >= innerWidth) { b.vx *= -1; b.x = Math.max(0, Math.min(b.x, innerWidth - w)); bounced = true }
             if (b.y <= 0 || b.y + h >= innerHeight) { b.vy *= -1; b.y = Math.max(0, Math.min(b.y, innerHeight - h)); bounced = true }
