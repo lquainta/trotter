@@ -23,9 +23,8 @@ module Trotter
     #
     config.time_zone = "Mountain Time (US & Canada)" # Boise
 
-    # Until launch, the site is a single "Hello World" page. Set TROTTER_SHOW_APP=true for the full app.
-    # The tests always run against the full app.
-    config.x.show_app = ENV.fetch("TROTTER_SHOW_APP") { Rails.env.test? ? "true" : "false" } == "true"
+    # The full app is on by default. Set TROTTER_SHOW_APP=false to show only the "Hello World" page instead.
+    config.x.show_app = ENV.fetch("TROTTER_SHOW_APP", "true") != "false"
     # config.eager_load_paths << Rails.root.join("extras")
   end
 end

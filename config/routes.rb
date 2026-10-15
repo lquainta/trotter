@@ -10,8 +10,8 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
-  # The full app is hidden until launch (see config.x.show_app in config/application.rb);
-  # until then every other URL is a 404.
+  # TROTTER_SHOW_APP=false hides the full app behind a "Hello World" page
+  # (see config.x.show_app in config/application.rb); every other URL is then a 404.
   if Rails.configuration.x.show_app
     resource :session, only: %i[ new create destroy ]
     resource :registration, only: %i[ new create ]
@@ -22,7 +22,7 @@ Rails.application.routes.draw do
     end
     resources :activities, only: %i[ index new create ]
 
-    root "activities#index"
+    root "pages#home"
   else
     root "pages#hello"
   end

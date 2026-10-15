@@ -53,10 +53,10 @@ class RoutesTest < ApplicationSystemTestCase
     JS
     assert_healthy_maps ".feed-map", count: feed_maps
 
-    click_on "Log a Ride"
+    within("header") { click_on "Log a Ride" }
     assert_healthy_maps "#route-draw-map", count: 1
 
-    click_on "Feed"
+    within("header") { click_on "Feed" }
     assert_healthy_maps ".feed-map", count: feed_maps
 
     page.go_back

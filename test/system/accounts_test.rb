@@ -3,7 +3,7 @@ require "application_system_test_case"
 class AccountsTest < ApplicationSystemTestCase
   test "signing up, then viewing your profile" do
     visit root_url
-    click_on "Sign up"
+    within("header") { click_on "Sign up" }
 
     fill_in "Username", with: "Trail_Rider"
     fill_in "Password", with: "password123"
@@ -61,7 +61,7 @@ class AccountsTest < ApplicationSystemTestCase
 
     choose_option "Kilometers"
     click_on "Save preferences"
-    click_on "Feed"
+    within("header") { click_on "Feed" }
 
     within "##{dom_id(activities(:boise_loop))}" do
       assert_text "1.33 km"
