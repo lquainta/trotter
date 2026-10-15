@@ -9,7 +9,7 @@
 #   sudo bash deploy/setup-ec2.sh            # HTTP only
 #   sudo bash deploy/setup-ec2.sh --https    # also get HTTPS for trotter-app.com
 #
-# It installs Ruby (through rbenv), libvips and nginx, creates /opt/trotter,
+# It installs Ruby (through rbenv) and nginx, creates /opt/trotter,
 # sets nginx to forward port 80 to the app, and registers deploy/trotter.service
 # with systemd so the app starts on boot. After this, use deploy/deploy.sh from
 # your laptop to push code.
@@ -70,9 +70,7 @@ apt-get install -y --no-install-recommends \
     build-essential pkg-config \
     libssl-dev libreadline-dev zlib1g-dev libyaml-dev libffi-dev libgmp-dev \
     sqlite3 libsqlite3-dev \
-    libvips libheif-plugin-libde265 \
     nginx certbot python3-certbot-nginx
-# libheif only suggests the HEVC decoder plugin, which iPhone HEIC photos need.
 
 # --- swap -------------------------------------------------------------------
 

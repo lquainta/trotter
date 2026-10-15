@@ -9,9 +9,10 @@
 #
 # What it does:
 #   1. Runs the tests (skip with -s).
-#   2. rsyncs the code to /opt/trotter on the server. The database and uploaded
-#      photos (storage/), logs and installed gems stay on the server.
-#   3. Installs gems, applies database migrations and compiles assets there.
+#   2. rsyncs the code to /opt/trotter on the server. The database (storage/),
+#      logs and installed gems stay on the server.
+#   3. Installs gems, applies database migrations, loads the sample rides and
+#      compiles assets there.
 #   4. Restarts the systemd service and checks http://HOST/api/health.
 #
 # Options:
@@ -94,6 +95,7 @@ ssh "${SSH_OPTS[@]}" "$TARGET" "
     set -a; . /etc/trotter.env; set +a
     export RAILS_ENV=production
     bin/rails db:prepare
+    bin/rails db:seed
     bin/rails assets:precompile
     sudo systemctl restart ${SERVICE}
     sleep 3

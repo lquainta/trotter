@@ -1,19 +1,13 @@
 <section class="card overflow-hidden">
   <div class="bg-gradient-to-br from-amber-100 via-amber-50 to-stone-50 px-6 py-10 text-center dark:from-amber-950 dark:via-stone-900 dark:to-stone-900">
     <p class="text-5xl" aria-hidden="true">🐴</p>
-    <h1 class="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">Every ride, mapped and shared</h1>
+    <h1 class="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">Every ride, logged and shared</h1>
     <p class="mx-auto mt-3 max-w-xl text-stone-600 dark:text-stone-300">
-      Trotter is a ride tracker for horses and their riders. Draw your route on a map, log how long you rode,
-      add photos of the views, and see where everyone else has been riding.
+      Trotter is a ride tracker for horses and their riders. Log where you rode and how long it took,
+      and see where everyone else has been riding.
     </p>
-    <div class="mt-6 flex flex-wrap justify-center gap-3">
-      <% if authenticated? %>
-        <%= link_to "Log your next ride", new_activity_path, class: "btn-primary" %>
-        <%= link_to "View your profile", user_path(Current.user), class: "btn-secondary" %>
-      <% else %>
-        <%= link_to "Join Trotter", new_registration_path, class: "btn-primary" %>
-        <%= link_to "Browse the feed", activities_path, class: "btn-secondary" %>
-      <% end %>
+    <div class="mt-6">
+      <%= link_to "Browse the feed", activities_path, class: "btn-primary" %>
     </div>
   </div>
 </section>
@@ -22,24 +16,17 @@
   <h2 class="text-xl font-bold">How it works</h2>
   <ol class="mt-4 grid gap-4 sm:grid-cols-3">
     <li class="card p-4">
-      <p class="font-semibold">1. Create an account</p>
-      <p class="mt-1 text-sm text-stone-600 dark:text-stone-300">
-        <%= link_to "Sign up", new_registration_path, class: "text-amber-800 underline dark:text-amber-400", id: "home-sign-up" %>
-        with a username, or <%= link_to "log in", new_session_path, class: "text-amber-800 underline dark:text-amber-400" %>.
-      </p>
+      <p class="font-semibold">1. Ride</p>
+      <p class="mt-1 text-sm text-stone-600 dark:text-stone-300">Head out on the trail, around the farm, or into the arena.</p>
     </li>
     <li class="card p-4">
-      <p class="font-semibold">2. Log a ride</p>
-      <p class="mt-1 text-sm text-stone-600 dark:text-stone-300">
-        Click points on the map to <%= link_to "draw your route", new_activity_path, class: "text-amber-800 underline dark:text-amber-400" %>.
-        Trotter works out the distance, pace, and speed.
-      </p>
+      <p class="font-semibold">2. Log it</p>
+      <p class="mt-1 text-sm text-stone-600 dark:text-stone-300">Trotter works out your distance, time, and pace.</p>
     </li>
     <li class="card p-4">
       <p class="font-semibold">3. Share it</p>
       <p class="mt-1 text-sm text-stone-600 dark:text-stone-300">
-        Your ride shows up in the <%= link_to "feed", activities_path, class: "text-amber-800 underline dark:text-amber-400" %>
-        with its map and photos. Pick your theme and units in <%= link_to "settings", settings_path, class: "text-amber-800 underline dark:text-amber-400" %>.
+        Your ride shows up in the <%= link_to "feed", activities_path, class: "text-amber-800 underline dark:text-amber-400" %> for everyone to see.
       </p>
     </li>
   </ol>
@@ -53,10 +40,10 @@
 
   <% if @recent_activities.empty? %>
     <p class="mt-4 rounded-lg border border-dashed border-stone-300 px-4 py-10 text-center text-stone-500 dark:border-stone-700 dark:text-stone-400">
-      No rides yet. Be the first to log one!
+      No rides yet.
     </p>
   <% else %>
-    <div class="mt-4 space-y-6">
+    <div class="mt-4 space-y-4">
       <%= render @recent_activities %>
     </div>
   <% end %>

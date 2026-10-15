@@ -10,9 +10,6 @@
 #   ./start.sh --port 4000  listen somewhere other than port 3000
 #   ./start.sh --help       show this message
 #
-# To show only the "Hello World" page instead of the full app:
-#   TROTTER_SHOW_APP=false ./start.sh
-#
 # This is for development. On the EC2 server, systemd starts the app instead --
 # see deploy/setup-ec2.sh and deploy/trotter.service.
 #
@@ -78,7 +75,7 @@ command -v ruby >/dev/null 2>&1 \
 ruby -e "exit(Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('${REQUIRED_RUBY}') ? 0 : 1)" \
     || die "Ruby $(ruby -e 'print RUBY_VERSION') is too old. Trotter needs Ruby ${REQUIRED_RUBY} or newer (see README.md, step 1)."
 
-# Several gems (puma, bcrypt, bootsnap, ...) compile C code when installed.
+# Several gems (puma, bootsnap, ...) compile C code when installed.
 command -v make >/dev/null 2>&1 && { command -v cc >/dev/null 2>&1 || command -v gcc >/dev/null 2>&1; } \
     || die "a C compiler and make are not installed. On Ubuntu: sudo apt install build-essential. On macOS: xcode-select --install."
 
@@ -86,13 +83,6 @@ if ! command -v bundle >/dev/null 2>&1; then
     say "Installing Bundler"
     gem install bundler --no-document \
         || die "could not install Bundler. Try: gem install bundler"
-fi
-
-# libvips resizes photos. Everything else works without it, so only warn.
-if ! command -v vips >/dev/null 2>&1 && ! pkg-config --exists vips 2>/dev/null \
-    && ! { command -v ldconfig >/dev/null 2>&1 && ldconfig -p | grep -q 'libvips\.so'; }; then
-    warn "libvips is not installed, so uploaded photos won't be resized or shown."
-    warn "On Ubuntu: sudo apt install libvips-tools libheif-plugin-libde265. On macOS: brew install vips."
 fi
 
 # --- dependencies -----------------------------------------------------------
@@ -108,7 +98,7 @@ fi
 
 # Creates the SQLite database in storage/ on the first run and applies any new
 # migrations after that. The seeds use find_or_create_by, so running them again
-# doesn't duplicate anything. Every sample account's password is "password123".
+# doesn't duplicate anything.
 say "Preparing the database and sample data"
 bin/rails db:prepare
 bin/rails db:seed
@@ -119,9 +109,6 @@ bin/rails tailwindcss:build
 # --- start ------------------------------------------------------------------
 
 say "Starting Trotter on http://localhost:${PORT} -- press Ctrl+C to stop"
-if [ "${TROTTER_SHOW_APP:-}" != "false" ]; then
-    say "Sample login: username demo, password password123"
-fi
 
 # exec replaces this shell with the server, so Ctrl+C reaches it directly.
 exec bin/rails server --port "$PORT"

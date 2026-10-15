@@ -1,29 +1,10 @@
 Rails.application.routes.draw do
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
-
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
   get "api/health" => "rails/health#show"
 
-  # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
-  # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
-  # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
+  resources :activities, only: :index
 
-  # TROTTER_SHOW_APP=false hides the full app behind a "Hello World" page
-  # (see config.x.show_app in config/application.rb); every other URL is then a 404.
-  if Rails.configuration.x.show_app
-    resource :session, only: %i[ new create destroy ]
-    resource :registration, only: %i[ new create ]
-    resources :users, only: :show, param: :username
-    resource :settings, only: %i[ show update ]
-    namespace :settings do
-      resource :password, only: :update
-    end
-    resources :activities, only: %i[ index new create ]
-
-    root "pages#home"
-  else
-    root "pages#hello"
-  end
+  root "pages#home"
 end

@@ -23,8 +23,6 @@ module Trotter
     #
     config.time_zone = "Mountain Time (US & Canada)" # Boise
 
-    # The full app is on by default. Set TROTTER_SHOW_APP=false to show only the "Hello World" page instead.
-    config.x.show_app = ENV.fetch("TROTTER_SHOW_APP", "true") != "false"
     # config.eager_load_paths << Rails.root.join("extras")
   end
 end
