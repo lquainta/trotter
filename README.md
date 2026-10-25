@@ -1,6 +1,6 @@
 # 🐴 Trotter
 
-A Strava-style ride tracker for horses and their riders. This is Checkpoint 1: the foundation, with a landing page and a feed of sample rides. Accounts, logging rides on a map, photos, horses, and search arrive in later checkpoints.
+A Strava-style ride tracker for horses and their riders. This is Checkpoint 2: rider accounts, profiles, and settings on top of the Checkpoint 1 landing page and feed. Logging rides on a map, photos, horses, and search arrive in later checkpoints.
 
 **Live site:** https://trotter-app.com
 
@@ -8,7 +8,10 @@ A Strava-style ride tracker for horses and their riders. This is Checkpoint 1: t
 
 - **Landing page** (`/`) introducing Trotter, with the three most recent rides.
 - **Feed** (`/activities`) of every ride, newest first, with its distance, time, and pace.
-- **Shared header and footer** on every page, in light or dark mode to match your device.
+- **Accounts** (`/registration/new`, `/session/new`): sign up, log in, and log out with a username and password (bcrypt via `has_secure_password`; 10 login attempts per 3 minutes).
+- **Rider profiles** (`/users/:username`) with each rider's total rides, distance, and time, and their rides.
+- **Settings** (`/settings`): light, dark, or system appearance; miles or kilometers; change password (logs out your other devices); log out; delete your account and rides (needs your password).
+- **Shared header and footer** on every page. Logged-out visitors see Log in and Sign up; riders see their avatar and a Settings gear.
 
 ## Tech stack
 
@@ -38,7 +41,7 @@ cd trotter
 ./start.sh
 ```
 
-`start.sh` checks the tools above, installs the Ruby gems, creates the SQLite database with sample rides, builds the CSS, and starts the app at **http://localhost:3000**. It's safe to run again. Use `./start.sh --port 4000` for another port.
+`start.sh` checks the tools above, installs the Ruby gems, creates the SQLite database with sample riders and rides (log in as `demo` / `password123`), builds the CSS, and starts the app at **http://localhost:3000**. It's safe to run again. Use `./start.sh --port 4000` for another port.
 
 For development with automatic CSS rebuilding, use `bin/dev` instead.
 
@@ -64,7 +67,7 @@ The `deploy/` folder holds everything for an Ubuntu 24.04 instance (the security
 | `deploy/setup-ec2.sh` | One-time server setup, run on the server with sudo: Ruby (via rbenv), nginx, `/opt/trotter`, and the systemd service |
 | `deploy/trotter.service` | The systemd unit that starts Trotter on boot and restarts it if it crashes |
 | `deploy/nginx-trotter.conf`, `deploy/nginx-trotter-proxy.conf` | nginx forwards ports 80/443 to Puma on port 3000 |
-| `deploy/deploy.sh` | Run from your laptop: tests, copies the code with rsync, installs gems, migrates, loads the sample rides, restarts, and checks `/api/health` |
+| `deploy/deploy.sh` | Run from your laptop: tests, copies the code with rsync, installs gems, migrates, loads the sample riders and rides, restarts, and checks `/api/health` |
 
 **One-time server setup** (compiling Ruby takes 20-30 minutes on a t2.micro):
 

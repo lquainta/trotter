@@ -1,5 +1,5 @@
 foothills:
-  rider_name: demo
+  user: rider
   title: Foothills loop
   description: Up the gulch and back along the ridge.
   started_at: <%= 1.day.ago %>
@@ -7,21 +7,21 @@ foothills:
   distance_meters: 9656.064
 
 arena:
-  rider_name: bluegrass_belle
+  user: km_rider
   title: Arena schooling
   started_at: <%= 3.days.ago %>
   duration: 615
   distance_meters: 1609.344
 
 hack:
-  rider_name: rotten_row
+  user: km_rider
   title: Morning hack
   started_at: <%= 5.days.ago %>
   duration: 2700
   distance_meters: 4828.032
 
 creek:
-  rider_name: demo
+  user: rider
   title: Creek crossing practice
   started_at: <%= 7.days.ago %>
   duration: 3900

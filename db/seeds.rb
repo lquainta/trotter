@@ -1,15 +1,20 @@
-# Sample rides for the feed. Riders can't log their own until Checkpoint 3.
-# Safe to run again: each ride is found by its title before it's created.
+# Sample riders and rides for the feed. Riders can't log their own rides until Checkpoint 3.
+# Every sample account's password is "password123".
+# Safe to run again: each rider and ride is found before it's created.
+riders = %w[ demo bluegrass_belle rotten_row ].index_with do |username|
+  User.find_or_create_by!(username: username) { |user| user.password = "password123" }
+end
+
 [
-  { rider_name: "demo", title: "Foothills loop", description: "Up Hulls Gulch and back along the ridge. Dusty but gorgeous.",
+  { user: riders["demo"], title: "Foothills loop", description: "Up Hulls Gulch and back along the ridge. Dusty but gorgeous.",
     started_at: 1.day.ago.change(hour: 7, min: 15), duration: 1.hour + 20.minutes, distance_meters: 9_656 },
-  { rider_name: "bluegrass_belle", title: "Morning hack around the farm", description: "Easy walk and trot to start the week.",
+  { user: riders["bluegrass_belle"], title: "Morning hack around the farm", description: "Easy walk and trot to start the week.",
     started_at: 2.days.ago.change(hour: 8, min: 0), duration: 45.minutes, distance_meters: 4_828 },
-  { rider_name: "rotten_row", title: "Rotten Row, Hyde Park", description: "A proper London hack down the historic bridleway.",
+  { user: riders["rotten_row"], title: "Rotten Row, Hyde Park", description: "A proper London hack down the historic bridleway.",
     started_at: 3.days.ago.change(hour: 9, min: 0), duration: 10.minutes + 15.seconds, distance_meters: 1_609 },
-  { rider_name: "demo", title: "Arena schooling", description: "Flatwork in the indoor arena.",
+  { user: riders["demo"], title: "Arena schooling", description: "Flatwork in the indoor arena.",
     started_at: 4.days.ago.change(hour: 17, min: 30), duration: 50.minutes, distance_meters: 3_219 },
-  { rider_name: "bluegrass_belle", title: "Creek crossing practice", description: nil,
+  { user: riders["bluegrass_belle"], title: "Creek crossing practice", description: nil,
     started_at: 6.days.ago.change(hour: 16, min: 45), duration: 1.hour + 5.minutes, distance_meters: 6_437 }
 ].each do |ride|
   Activity.find_or_create_by!(title: ride[:title]) do |activity|

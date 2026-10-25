@@ -10,9 +10,8 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_15_220000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_20_000002) do
   create_table "activities", force: :cascade do |t|
-    t.string "rider_name", null: false
     t.string "title", null: false
     t.text "description"
     t.datetime "started_at", null: false
@@ -20,6 +19,30 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_15_220000) do
     t.float "distance_meters", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
     t.index ["started_at"], name: "index_activities_on_started_at"
+    t.index ["user_id"], name: "index_activities_on_user_id"
   end
+
+  create_table "sessions", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "ip_address"
+    t.string "user_agent"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_sessions_on_user_id"
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.string "username", null: false
+    t.string "password_digest", null: false
+    t.string "theme", default: "system", null: false
+    t.string "distance_unit", default: "mi", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["username"], name: "index_users_on_username", unique: true
+  end
+
+  add_foreign_key "activities", "users"
+  add_foreign_key "sessions", "users"
 end

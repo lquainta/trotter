@@ -11,6 +11,15 @@ class ActivitiesControllerTest < ActionDispatch::IntegrationTest
     assert_select "##{dom_id(activities(:foothills))} dd", "13:20 /mi"
   end
 
+  test "the feed links each ride to its rider and uses the viewer's units" do
+    sign_in_as users(:km_rider)
+    get activities_path
+
+    assert_select "##{dom_id(activities(:foothills))} a[href=?]", user_path(users(:rider)), text: "rider"
+    assert_select "##{dom_id(activities(:foothills))} dd", "9.66 km"
+    assert_select "##{dom_id(activities(:foothills))} dd", "8:17 /km"
+  end
+
   test "the feed shows a message when there are no rides" do
     Activity.delete_all
     get activities_path
