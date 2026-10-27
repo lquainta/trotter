@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_20_000002) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_27_000000) do
   create_table "activities", force: :cascade do |t|
     t.string "title", null: false
     t.text "description"
@@ -20,6 +20,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_000002) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
+    t.json "route_coordinates", default: [], null: false
     t.index ["started_at"], name: "index_activities_on_started_at"
     t.index ["user_id"], name: "index_activities_on_user_id"
   end

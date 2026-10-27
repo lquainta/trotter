@@ -3,11 +3,16 @@
     <p class="text-5xl" aria-hidden="true">🐴</p>
     <h1 class="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">Every ride, logged and shared</h1>
     <p class="mx-auto mt-3 max-w-xl text-stone-600 dark:text-stone-300">
-      Trotter is a ride tracker for horses and their riders. Log where you rode and how long it took,
+      Trotter is a ride tracker for horses and their riders. Draw where you rode on a map, add how long it took,
       and see where everyone else has been riding.
     </p>
-    <div class="mt-6">
-      <%= link_to "Browse the feed", activities_path, class: "btn-primary" %>
+    <div class="mt-6 flex flex-wrap justify-center gap-3">
+      <% if authenticated? %>
+        <%= link_to "Log a ride", new_activity_path, class: "btn-primary" %>
+      <% else %>
+        <%= link_to "Sign up", new_registration_path, class: "btn-primary" %>
+      <% end %>
+      <%= link_to "Browse the feed", activities_path, class: "btn-secondary px-4 py-2 text-base" %>
     </div>
   </div>
 </section>
@@ -21,7 +26,9 @@
     </li>
     <li class="card p-4">
       <p class="font-semibold">2. Log it</p>
-      <p class="mt-1 text-sm text-stone-600 dark:text-stone-300">Trotter works out your distance, time, and pace.</p>
+      <p class="mt-1 text-sm text-stone-600 dark:text-stone-300">
+        <%= link_to "Draw your route", new_activity_path, class: "text-amber-800 underline dark:text-amber-400" %> on the map, and Trotter works out your distance, pace, and speed.
+      </p>
     </li>
     <li class="card p-4">
       <p class="font-semibold">3. Share it</p>

@@ -42,4 +42,12 @@ module ApplicationHelper
     minutes, seconds = (seconds / (meters / METERS_PER_UNIT[unit])).round.divmod(60)
     format("%d:%02d /%s", minutes, seconds, unit)
   end
+
+  # Distance per hour: 9656 meters in 4800 seconds => "4.5 mph", or "7.2 km/h"
+  def format_speed(meters, seconds, unit = current_distance_unit)
+    return "—" unless seconds.to_f.positive?
+
+    per_hour = meters / METERS_PER_UNIT[unit] / (seconds / 3600.0)
+    "#{number_with_precision(per_hour, precision: 1)} #{unit == "mi" ? "mph" : "km/h"}"
+  end
 end

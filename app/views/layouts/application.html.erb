@@ -17,6 +17,9 @@
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
+    <%# Leaflet's styles for the ride maps, pinned to the same version as its JavaScript in config/importmap.rb. %>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""
+          integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H">
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
@@ -32,6 +35,7 @@
           <%= link_to "Feed", activities_path, class: "text-stone-600 hover:text-stone-900 dark:text-stone-300 dark:hover:text-white" %>
 
           <% if authenticated? %>
+            <%= link_to "Log a Ride", new_activity_path, class: "whitespace-nowrap text-stone-600 hover:text-stone-900 dark:text-stone-300 dark:hover:text-white" %>
             <%= link_to user_path(Current.user), title: "Your profile", class: "rounded-full" do %>
               <%= avatar_for Current.user, size: "size-8 text-sm" %>
               <span class="sr-only">Your profile</span>
@@ -67,9 +71,10 @@
         <nav aria-label="Footer" class="flex flex-wrap gap-x-4 gap-y-2">
           <%= link_to "Home", root_path, class: "hover:text-stone-900 dark:hover:text-white" %>
           <%= link_to "Feed", activities_path, class: "hover:text-stone-900 dark:hover:text-white" %>
+          <%= link_to "Log a Ride", new_activity_path, class: "hover:text-stone-900 dark:hover:text-white" %>
           <%= link_to "GitHub", "https://github.com/lquainta/trotter", class: "hover:text-stone-900 dark:hover:text-white" %>
         </nav>
-        <p>&copy; <%= Date.current.year %> Trotter</p>
+        <p>&copy; <%= Date.current.year %> Trotter &middot; Map data &copy; OpenStreetMap contributors</p>
       </div>
     </footer>
   </body>

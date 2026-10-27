@@ -1,0 +1,61 @@
+<% content_for :title, "Log a Ride · Trotter" %>
+
+<h1 class="text-2xl font-bold">Log a ride</h1>
+<p class="mt-1 text-stone-600 dark:text-stone-300">Draw where you rode, then add how long it took.</p>
+
+<%= form_with model: @activity, class: "card mt-6 space-y-6 p-6" do |form| %>
+  <%= render "shared/form_errors", record: @activity %>
+
+  <%# Boise, until there's a route to frame %>
+  <fieldset data-controller="route-editor" data-route-editor-unit-value="<%= current_distance_unit %>"
+            data-route-editor-center-value="[43.615, -116.2023]" data-route-editor-zoom-value="13">
+    <legend class="form-label">Route</legend>
+    <p class="form-hint">Click the map at each turn of your ride. Drag to move the map, and scroll or use + and − to zoom.</p>
+
+    <div data-route-editor-target="map" class="isolate mt-2 h-80 cursor-crosshair rounded-md border border-stone-300 sm:h-96 dark:border-stone-700"></div>
+    <%= form.hidden_field :route_coordinates, value: @activity.route_coordinates.to_json, data: { route_editor_target: "input" } %>
+
+    <div class="mt-3 flex flex-wrap items-center gap-3">
+      <p class="mr-auto text-sm">
+        Distance: <strong data-route-editor-target="distance" class="tabular-nums" aria-live="polite"><%= format_distance(0) %></strong>
+      </p>
+      <button type="button" class="btn-secondary" data-route-editor-target="undo" data-action="route-editor#undo" disabled>Undo last point</button>
+      <button type="button" class="btn-secondary" data-route-editor-target="clear" data-action="route-editor#clear" disabled>Clear route</button>
+    </div>
+  </fieldset>
+
+  <div>
+    <%= form.label :title, class: "form-label" %>
+    <%= form.text_field :title, required: true, maxlength: 100, placeholder: "Morning trail ride", class: "form-input" %>
+  </div>
+
+  <div>
+    <%= form.label :description, class: "form-label" %>
+    <%= form.text_area :description, rows: 3, placeholder: "How did it go?", class: "form-input" %>
+  </div>
+
+  <div class="grid gap-6 sm:grid-cols-2">
+    <div>
+      <%= form.label :started_at, "Start time", class: "form-label" %>
+      <%= form.datetime_local_field :started_at, required: true, class: "form-input" %>
+    </div>
+
+    <fieldset>
+      <legend class="form-label">Duration</legend>
+      <div class="grid grid-cols-3 gap-2">
+        <% { duration_hours: [ "h", 99 ], duration_minutes: [ "m", 59 ], duration_seconds: [ "s", 59 ] }.each do |field, (suffix, max)| %>
+          <div class="relative">
+            <%= form.label field, class: "sr-only" %>
+            <%= form.number_field field, min: 0, max: max, placeholder: "0", class: "form-input pr-7 tabular-nums" %>
+            <span class="pointer-events-none absolute right-3 bottom-2 text-stone-500 dark:text-stone-400" aria-hidden="true"><%= suffix %></span>
+          </div>
+        <% end %>
+      </div>
+    </fieldset>
+  </div>
+
+  <div class="flex items-center gap-4">
+    <%= form.submit "Log ride", class: "btn-primary" %>
+    <%= link_to "Cancel", activities_path, class: "text-sm font-medium text-stone-600 hover:underline dark:text-stone-300" %>
+  </div>
+<% end %>

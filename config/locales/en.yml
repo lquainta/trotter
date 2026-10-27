@@ -4,5 +4,12 @@
 en:
   activerecord:
     attributes:
+      activity:
+        distance_meters: "Distance"
+        duration_hours: "Hours"
+        duration_minutes: "Minutes"
+        duration_seconds: "Seconds"
+        route_coordinates: "Route"
+        started_at: "Start time"
       user:
         password_challenge: "Current password"

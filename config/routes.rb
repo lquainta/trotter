@@ -12,7 +12,7 @@ Rails.application.routes.draw do
     resource :password, only: :update
     resource :account, only: :destroy
   end
-  resources :activities, only: :index
+  resources :activities, only: %i[ index new create ]
 
   root "pages#home"
 end

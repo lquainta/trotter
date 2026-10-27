@@ -1,17 +1,19 @@
 # 🐴 Trotter
 
-A Strava-style ride tracker for horses and their riders. This is Checkpoint 2: rider accounts, profiles, and settings on top of the Checkpoint 1 landing page and feed. Logging rides on a map, photos, horses, and search arrive in later checkpoints.
+A Strava-style ride tracker for horses and their riders. This is Checkpoint 3: logging rides by drawing the route on a map, on top of the accounts, profiles, and settings from Checkpoint 2 and the landing page and feed from Checkpoint 1. Ride pages, photos, horses, and search arrive in later checkpoints.
 
 **Live site:** https://trotter-app.com
 
 ## Features
 
 - **Landing page** (`/`) introducing Trotter, with the three most recent rides.
-- **Feed** (`/activities`) of every ride, newest first, with its distance, time, and pace.
+- **Log a Ride** (`/activities/new`, logged-in riders): click the map to draw the route, with Undo last point and Clear route, and a live distance readout; plus title, description, start time, and duration in hours, minutes, and seconds.
+- **Distance, pace, and speed**: the distance is calculated from the route (haversine formula) when the ride is saved; pace (time per mile or km) and speed (mph or km/h) follow the rider's units.
+- **Feed** (`/activities`) of every ride, newest first, with its distance, time, pace, speed, and a map framed around its route. The map code is Turbo-safe: it cleans up on page changes, so Back and Forward never leave a broken or doubled map.
 - **Accounts** (`/registration/new`, `/session/new`): sign up, log in, and log out with a username and password (bcrypt via `has_secure_password`; 10 login attempts per 3 minutes).
 - **Rider profiles** (`/users/:username`) with each rider's total rides, distance, and time, and their rides.
 - **Settings** (`/settings`): light, dark, or system appearance; miles or kilometers; change password (logs out your other devices); log out; delete your account and rides (needs your password).
-- **Shared header and footer** on every page. Logged-out visitors see Log in and Sign up; riders see their avatar and a Settings gear.
+- **Shared header and footer** on every page. Logged-out visitors see Log in and Sign up; riders see Log a Ride, their avatar, and a Settings gear.
 
 ## Tech stack
 
@@ -19,7 +21,8 @@ A Strava-style ride tracker for horses and their riders. This is Checkpoint 2: r
 |---|---|
 | Language / framework | Ruby 3.3.5, Ruby on Rails 8.1 |
 | Database | SQLite |
-| Frontend | ERB views, Hotwire (Turbo), import maps, Tailwind CSS 4 |
+| Frontend | ERB views, Hotwire (Turbo and Stimulus), import maps, Tailwind CSS 4 |
+| Maps | Leaflet 1.9.4 (from unpkg, with Subresource Integrity hashes) and OpenStreetMap tiles |
 | Web server | Puma behind nginx (HTTPS via Let's Encrypt and certbot) |
 | Hosting | AWS EC2, Ubuntu 24.04 |
 

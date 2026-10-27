@@ -7,15 +7,20 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_equal "45m", format_duration(2700)
     assert_equal "10m 15s", format_duration(615)
     assert_equal "13:20 /mi", format_pace(9656.064, 4800)
+    assert_equal "4.5 mph", format_speed(9656.064, 4800)
+    assert_equal "1h 23m", format_duration(4980)
+    assert_equal "7:30 /mi", format_pace(1609.344, 450)
   end
 
   test "formats distance and pace in kilometers" do
     assert_equal "9.66 km", format_distance(9656.064, "km")
     assert_equal "8:17 /km", format_pace(9656.064, 4800, "km")
+    assert_equal "7.2 km/h", format_speed(9656.064, 4800, "km")
   end
 
-  test "pace with no distance" do
+  test "pace with no distance, and speed with no time" do
     assert_equal "—", format_pace(0, 600)
+    assert_equal "—", format_speed(1000, 0)
   end
 
   test "logged-out visitors get the device theme and miles" do

@@ -5,6 +5,7 @@ foothills:
   started_at: <%= 1.day.ago %>
   duration: 4800
   distance_meters: 9656.064
+  route_coordinates: <%= [ [ 43.6342, -116.1862 ], [ 43.6570, -116.1705 ], [ 43.6650, -116.1845 ], [ 43.6342, -116.1862 ] ].to_json %>
 
 arena:
   user: km_rider

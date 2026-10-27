@@ -1,6 +1,10 @@
 require "test_helper"
 
 class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
+  # bin/rails test:all runs the browser tests in parallel with everything else, and logging in
+  # (bcrypt) can take a few seconds on a busy machine.
+  Capybara.default_max_wait_time = 5
+
   driven_by :selenium, using: :headless_chrome, screen_size: [ 1400, 1400 ] do |options|
     # Chrome's "this password was in a data breach" warning (test passwords like password123 trigger it)
     # takes over the mouse, so clicks never reach the page.
