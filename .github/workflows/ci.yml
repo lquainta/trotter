@@ -83,6 +83,9 @@ jobs:
         with:
           bundler-cache: true
 
+      - name: Install libvips for ride photos
+        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y libvips42t64 libheif-plugin-libde265
+
       - name: Run tests
         env:
           RAILS_ENV: test
@@ -107,6 +110,9 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
+
+      - name: Install libvips for ride photos
+        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y libvips42t64 libheif-plugin-libde265
 
       - name: Run System Tests
         env:

@@ -99,6 +99,28 @@ fi
 # Creates the SQLite database in storage/ on the first run and applies any new
 # migrations after that. The seeds use find_or_create_by, so running them again
 # doesn't duplicate anything. Every sample account's password is "password123".
+# Ride photos are resized and converted to WebP with libvips, a system library rather than a gem.
+# The app still starts without it, but uploaded photos can't be shown.
+vips_works() {
+    bundle exec ruby -e 'require "vips"' >/dev/null 2>&1
+}
+
+if vips_works; then
+    say "libvips (for ride photos) is already installed"
+else
+    say "Installing libvips (for ride photos)"
+    if command -v brew >/dev/null 2>&1; then
+        brew install vips || true
+    elif command -v apt-get >/dev/null 2>&1; then
+        # libheif-plugin-libde265 lets libvips read iPhone HEIC photos. Ubuntu 24.04 calls the
+        # library package libvips42t64; older releases call it libvips42.
+        sudo apt-get update -qq || true
+        sudo apt-get install -y --no-install-recommends libvips42t64 libheif-plugin-libde265 \
+            || sudo apt-get install -y --no-install-recommends libvips42 || true
+    fi
+    vips_works || warn "libvips could not be installed, so ride photos won't display. Install it (macOS: brew install vips; Ubuntu: sudo apt install libvips42t64) and run ./start.sh again."
+fi
+
 say "Preparing the database and sample data"
 bin/rails db:prepare
 bin/rails db:seed

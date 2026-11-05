@@ -89,6 +89,12 @@ ssh "${SSH_OPTS[@]}" "$TARGET" "
     set -e
     export PATH=\"\$HOME/.rbenv/shims:\$PATH\"
     cd '${REMOTE_DIR}'
+    # Ride photos need libvips (and its HEIC plugin). Servers set up before photos existed don't have it yet.
+    if ! dpkg -s libvips42t64 libheif-plugin-libde265 >/dev/null 2>&1; then
+        echo '==> Installing libvips for ride photos'
+        sudo DEBIAN_FRONTEND=noninteractive apt-get update -qq
+        sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends libvips42t64 libheif-plugin-libde265
+    fi
     bundle config set --local deployment true
     bundle config set --local without 'development test'
     bundle install --quiet

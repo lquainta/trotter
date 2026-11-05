@@ -70,6 +70,7 @@ apt-get install -y --no-install-recommends \
     build-essential pkg-config \
     libssl-dev libreadline-dev zlib1g-dev libyaml-dev libffi-dev libgmp-dev \
     sqlite3 libsqlite3-dev \
+    libvips42t64 libheif-plugin-libde265 \
     nginx certbot python3-certbot-nginx
 
 # --- swap -------------------------------------------------------------------

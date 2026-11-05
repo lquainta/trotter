@@ -37,6 +37,10 @@ gem "kamal", require: false
 # Add HTTP asset caching/compression and X-Sendfile acceleration to Puma [https://github.com/basecamp/thruster/]
 gem "thruster", require: false
 
+# Ride photos: Active Storage resizes them and converts them to WebP with libvips [https://www.libvips.org]
+gem "image_processing", "~> 2.1"
+gem "ruby-vips", "~> 2.2", require: false # Active Storage loads it when it needs it
+
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem

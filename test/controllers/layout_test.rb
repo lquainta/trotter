@@ -1,7 +1,8 @@
 require "test_helper"
 
 class LayoutTest < ActionDispatch::IntegrationTest
-  PAGES = -> { [ root_path, activities_path, user_path(users(:rider)), new_session_path, new_registration_path ] }
+  PAGES = -> { [ root_path, activities_path, activity_path(activities(:foothills)), user_path(users(:rider)), new_session_path,
+                 new_registration_path ] }
 
   test "every page has the same header and footer" do
     instance_exec(&PAGES).each do |path|
@@ -13,6 +14,8 @@ class LayoutTest < ActionDispatch::IntegrationTest
       assert_select "body > footer a[href=?]", activities_path
       assert_select "body > footer a[href=?]", new_activity_path
       assert_select "body > footer a[href=?]", "https://github.com/lquainta/trotter"
+      assert_select "body > footer a[href=?]", "http://54.244.82.148/", text: "PolymareKit"
+      assert_select "body > footer a[href=?]", "http://34.221.30.167/", text: "Horse Tinder"
     end
   end
 
@@ -28,7 +31,7 @@ class LayoutTest < ActionDispatch::IntegrationTest
   test "logged-in riders see Log a Ride, their profile, and settings instead" do
     sign_in_as users(:rider)
 
-    [ *instance_exec(&PAGES).first(3), new_activity_path ].each do |path|
+    [ *instance_exec(&PAGES).first(4), new_activity_path, edit_activity_path(activities(:foothills)) ].each do |path|
       get path
 
       assert_select "header a[href=?]", new_activity_path, text: "Log a Ride"

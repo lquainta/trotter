@@ -1,0 +1,89 @@
+<%# The Log a Ride and Edit Ride form. %>
+<%= form_with model: activity, class: "card mt-6 space-y-6 p-6" do |form| %>
+  <%= render "shared/form_errors", record: activity %>
+
+  <%# Boise, until there's a route to frame %>
+  <fieldset data-controller="route-editor" data-route-editor-unit-value="<%= current_distance_unit %>"
+            data-route-editor-center-value="[43.615, -116.2023]" data-route-editor-zoom-value="13">
+    <legend class="form-label">Route</legend>
+    <p class="form-hint">Click the map at each turn of your ride. Drag to move the map, and scroll or use + and − to zoom.</p>
+
+    <div data-route-editor-target="map" class="isolate mt-2 h-80 cursor-crosshair rounded-md border border-stone-300 sm:h-96 dark:border-stone-700"></div>
+    <%= form.hidden_field :route_coordinates, value: activity.route_coordinates.to_json, data: { route_editor_target: "input" } %>
+
+    <div class="mt-3 flex flex-wrap items-center gap-3">
+      <p class="mr-auto text-sm">
+        Distance: <strong data-route-editor-target="distance" class="tabular-nums" aria-live="polite"><%= format_distance(0) %></strong>
+      </p>
+      <button type="button" class="btn-secondary" data-route-editor-target="undo" data-action="route-editor#undo" disabled>Undo last point</button>
+      <button type="button" class="btn-secondary" data-route-editor-target="clear" data-action="route-editor#clear" disabled>Clear route</button>
+    </div>
+  </fieldset>
+
+  <div>
+    <%= form.label :title, class: "form-label" %>
+    <%= form.text_field :title, required: true, maxlength: 100, placeholder: "Morning trail ride", class: "form-input" %>
+  </div>
+
+  <div>
+    <%= form.label :description, class: "form-label" %>
+    <%= form.text_area :description, rows: 3, placeholder: "How did it go?", class: "form-input" %>
+  </div>
+
+  <div class="grid gap-6 sm:grid-cols-2">
+    <div>
+      <%= form.label :started_at, "Start time", class: "form-label" %>
+      <%= form.datetime_local_field :started_at, required: true, class: "form-input" %>
+    </div>
+
+    <fieldset>
+      <legend class="form-label">Duration</legend>
+      <div class="grid grid-cols-3 gap-2">
+        <% { duration_hours: [ "h", 99 ], duration_minutes: [ "m", 59 ], duration_seconds: [ "s", 59 ] }.each do |field, (suffix, max)| %>
+          <%# Editing a ride starts from its saved duration, split back into hours, minutes, and seconds. %>
+          <% value = activity.public_send(field) || (activity.duration && duration_part(activity.duration, field)) %>
+          <div class="relative">
+            <%= form.label field, class: "sr-only" %>
+            <%= form.number_field field, value: value, min: 0, max: max, placeholder: "0", class: "form-input pr-7 tabular-nums" %>
+            <span class="pointer-events-none absolute right-3 bottom-2 text-stone-500 dark:text-stone-400" aria-hidden="true"><%= suffix %></span>
+          </div>
+        <% end %>
+      </div>
+    </fieldset>
+  </div>
+
+  <fieldset>
+    <legend class="form-label">Photos</legend>
+
+    <% saved_photos = activity.saved_photos %>
+    <% if saved_photos.any? %>
+      <p class="form-hint">Check a photo to remove it when you save.</p>
+      <ul class="mt-2 grid grid-cols-3 gap-3 sm:grid-cols-5">
+        <% saved_photos.each do |photo| %>
+          <li>
+            <label class="block cursor-pointer">
+              <%= image_tag photo.variant(:thumb), alt: "Photo #{photo.blob.filename}", loading: "lazy",
+                    class: "aspect-square w-full rounded-md border border-stone-200 object-cover dark:border-stone-800" %>
+              <span class="mt-1 flex items-center gap-1.5 text-sm">
+                <%= check_box_tag "activity[remove_photo_ids][]", photo.id, activity.removing_photo?(photo),
+                      id: "remove_photo_#{photo.id}", class: "accent-red-700" %>
+                Remove
+              </span>
+            </label>
+          </li>
+        <% end %>
+      </ul>
+    <% end %>
+
+    <%= form.label :new_photos, "Add photos", class: "sr-only" %>
+    <%= form.file_field :new_photos, multiple: true, accept: (Activity::PHOTO_CONTENT_TYPES + %w[ .heic .heif ]).join(","),
+          class: "mt-2 block w-full text-sm text-stone-600 file:mr-3 file:cursor-pointer file:rounded-md file:border-0 file:bg-stone-200 file:px-3 file:py-1.5 file:font-medium file:text-stone-800 hover:file:bg-stone-300 dark:text-stone-300 dark:file:bg-stone-700 dark:file:text-stone-100" %>
+    <p class="form-hint">Up to <%= Activity::MAX_PHOTOS %> photos per ride, <%= Activity::MAX_PHOTO_SIZE / 1.megabyte %> MB each. JPEG, PNG, WebP, or iPhone HEIC.</p>
+  </fieldset>
+
+  <div class="flex items-center gap-4">
+    <%= form.submit activity.new_record? ? "Log ride" : "Save changes", class: "btn-primary" %>
+    <%= link_to "Cancel", activity.new_record? ? activities_path : activity_path(activity),
+          class: "text-sm font-medium text-stone-600 hover:underline dark:text-stone-300" %>
+  </div>
+<% end %>

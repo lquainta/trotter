@@ -36,6 +36,13 @@ module ApplicationHelper
   end
 
   # Time per mile or km: 9656 meters in 4800 seconds => "13:20 /mi"
+  # One part of a duration in seconds, for the h/m/s fields on Edit Ride: 3723 has 1 hour, 2 minutes, 3 seconds.
+  def duration_part(seconds, part)
+    hours, remainder = seconds.to_i.divmod(3600)
+    minutes, seconds = remainder.divmod(60)
+    { duration_hours: hours, duration_minutes: minutes, duration_seconds: seconds }.fetch(part)
+  end
+
   def format_pace(meters, seconds, unit = current_distance_unit)
     return "—" unless meters.to_f.positive?
 

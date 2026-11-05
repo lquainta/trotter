@@ -1,0 +1,8 @@
+# Where Active Storage keeps uploaded photos. Both are folders on the server's own disk.
+test:
+  service: Disk
+  root: <%= Rails.root.join("tmp/storage") %>
+
+local:
+  service: Disk
+  root: <%= Rails.root.join("storage") %>

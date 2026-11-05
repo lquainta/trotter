@@ -84,6 +84,59 @@ class ActivitiesTest < ApplicationSystemTestCase
     assert_selector "#{map} .leaflet-map-pane", count: 1
   end
 
+  test "editing a ride: redraw the route, add a photo, and remove one" do
+    ride = activities(:foothills)
+    ride.update!(new_photos: [ Rack::Test::UploadedFile.new(file_fixture("trail.jpg")) ])
+    log_in_as users(:rider)
+
+    visit activity_url(ride)
+    assert_selector "h1", text: "Foothills loop"
+    assert_selector "#photos img", count: 1
+    assert_selector ".leaflet-control-zoom" # the ride page's map can be zoomed
+    click_on "Edit"
+
+    assert_selector "h1", text: "Edit ride"
+    assert_route_points 4
+    click_on "Undo last point"
+    assert_route_points 3
+
+    fill_in "Title", with: "Foothills, short version"
+    check "Remove"
+    attach_file "Add photos", [ file_fixture("pasture.png"), file_fixture("iphone.heic") ]
+    click_on "Save changes"
+
+    assert_text "Ride updated."
+    assert_selector "h1", text: "Foothills, short version"
+    assert_selector "#photos img", count: 2
+    assert_equal %w[ pasture.png iphone.heic ], ride.reload.photos.map { |p| p.filename.to_s }
+    assert_equal 3, ride.route_coordinates.size
+    # Each photo, HEIC included, is shown as a WebP that the browser can display.
+    all("#photos img").each do |img|
+      assert page.evaluate_script("arguments[0].complete && arguments[0].naturalWidth > 0", img), "photo should load"
+    end
+  end
+
+  test "deleting a ride from its page" do
+    log_in_as users(:rider)
+    visit activity_url(activities(:creek))
+
+    accept_confirm { click_on "Delete" }
+
+    assert_text "Ride deleted."
+    assert_selector "h1", text: "Feed"
+    assert_no_text "Creek crossing practice"
+  end
+
+  test "another rider's edit page is not found" do
+    log_in_as users(:km_rider)
+    visit activity_url(activities(:foothills))
+    assert_no_link "Edit"
+
+    visit edit_activity_url(activities(:foothills))
+    assert_no_selector "h1", text: "Edit ride"
+    assert_no_field "Title"
+  end
+
   private
     # Offsets are from the middle of the map.
     def click_map(x, y)

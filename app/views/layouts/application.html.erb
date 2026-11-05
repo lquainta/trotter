@@ -67,12 +67,14 @@
     </main>
 
     <footer class="border-t border-stone-200 bg-white dark:border-stone-800 dark:bg-stone-900">
-      <div class="mx-auto flex max-w-3xl flex-col gap-3 px-4 py-6 text-sm text-stone-500 sm:flex-row sm:items-center sm:justify-between dark:text-stone-400">
+      <div class="mx-auto flex max-w-3xl flex-col gap-3 px-4 py-6 text-sm text-stone-500 dark:text-stone-400">
         <nav aria-label="Footer" class="flex flex-wrap gap-x-4 gap-y-2">
           <%= link_to "Home", root_path, class: "hover:text-stone-900 dark:hover:text-white" %>
           <%= link_to "Feed", activities_path, class: "hover:text-stone-900 dark:hover:text-white" %>
           <%= link_to "Log a Ride", new_activity_path, class: "hover:text-stone-900 dark:hover:text-white" %>
           <%= link_to "GitHub", "https://github.com/lquainta/trotter", class: "hover:text-stone-900 dark:hover:text-white" %>
+          <%= link_to "PolymareKit", "http://54.244.82.148/", class: "hover:text-stone-900 dark:hover:text-white" %>
+          <%= link_to "Horse Tinder", "http://34.221.30.167/", class: "hover:text-stone-900 dark:hover:text-white" %>
         </nav>
         <p>&copy; <%= Date.current.year %> Trotter &middot; Map data &copy; OpenStreetMap contributors</p>
       </div>

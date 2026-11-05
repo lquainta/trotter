@@ -4,6 +4,9 @@
 # and recreated between test runs. Don't rely on the data there!
 
 Rails.application.configure do
+  # Store uploaded files on the local file system in a temporary directory.
+  config.active_storage.service = :test
+
   # Settings specified here will take precedence over those in config/application.rb.
 
   # While tests run files are not watched, reloading is not necessary.

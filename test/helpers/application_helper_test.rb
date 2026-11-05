@@ -18,6 +18,12 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_equal "7.2 km/h", format_speed(9656.064, 4800, "km")
   end
 
+  test "a duration splits back into hours, minutes, and seconds" do
+    assert_equal 1, duration_part(3723, :duration_hours)
+    assert_equal 2, duration_part(3723, :duration_minutes)
+    assert_equal 3, duration_part(3723, :duration_seconds)
+  end
+
   test "pace with no distance, and speed with no time" do
     assert_equal "—", format_pace(0, 600)
     assert_equal "—", format_speed(1000, 0)

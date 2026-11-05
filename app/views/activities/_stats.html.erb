@@ -1,0 +1,10 @@
+<dl class="grid grid-cols-2 gap-2 sm:grid-cols-4">
+  <% { "Distance" => format_distance(activity.distance_meters), "Time" => format_duration(activity.duration),
+       "Pace" => format_pace(activity.distance_meters, activity.duration),
+       "Speed" => format_speed(activity.distance_meters, activity.duration) }.each do |label, value| %>
+    <div>
+      <dt class="text-xs text-stone-500 uppercase dark:text-stone-400"><%= label %></dt>
+      <dd class="<%= local_assigns[:size] || "font-semibold" %> tabular-nums"><%= value %></dd>
+    </div>
+  <% end %>
+</dl>

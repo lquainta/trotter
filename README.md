@@ -1,6 +1,6 @@
 # 🐴 Trotter
 
-A Strava-style ride tracker for horses and their riders. This is Checkpoint 3: logging rides by drawing the route on a map, on top of the accounts, profiles, and settings from Checkpoint 2 and the landing page and feed from Checkpoint 1. Ride pages, photos, horses, and search arrive in later checkpoints.
+A Strava-style ride tracker for horses and their riders. This is Checkpoint 4: ride pages, editing and deleting rides, and photos, on top of logging rides on a map (Checkpoint 3), accounts, profiles, and settings (Checkpoint 2), and the landing page and feed (Checkpoint 1). Horses and search arrive in later checkpoints.
 
 **Live site:** https://trotter-app.com
 
@@ -10,6 +10,10 @@ A Strava-style ride tracker for horses and their riders. This is Checkpoint 3: l
 - **Log a Ride** (`/activities/new`, logged-in riders): click the map to draw the route, with Undo last point and Clear route, and a live distance readout; plus title, description, start time, and duration in hours, minutes, and seconds.
 - **Distance, pace, and speed**: the distance is calculated from the route (haversine formula) when the ride is saved; pace (time per mile or km) and speed (mph or km/h) follow the rider's units.
 - **Feed** (`/activities`) of every ride, newest first, with its distance, time, pace, speed, and a map framed around its route. The map code is Turbo-safe: it cleans up on page changes, so Back and Forward never leave a broken or doubled map.
+- **Ride pages** (`/activities/:id`): a large map you can pan and zoom, the ride's stats and description, and a gallery of its photos (click one for the full-size version).
+- **Photos**: up to 10 per ride (JPEG, PNG, WebP, or iPhone HEIC, 20 MB each), added when logging or editing a ride. Active Storage keeps them on the server's disk, and libvips resizes them and converts them to WebP so HEIC photos display in any browser. Feed cards show the first few.
+- **Edit Ride** (`/activities/:id/edit`): change any detail, redraw the route, add photos, or check photos to remove them. **Delete Ride** (on the ride page and Edit Ride) asks first and deletes the ride's photos too.
+- **Owner-only changes**: editing and deleting look the ride up through the logged-in rider, so anyone else gets "not found" and never sees Edit or Delete.
 - **Accounts** (`/registration/new`, `/session/new`): sign up, log in, and log out with a username and password (bcrypt via `has_secure_password`; 10 login attempts per 3 minutes).
 - **Rider profiles** (`/users/:username`) with each rider's total rides, distance, and time, and their rides.
 - **Settings** (`/settings`): light, dark, or system appearance; miles or kilometers; change password (logs out your other devices); log out; delete your account and rides (needs your password).
@@ -22,6 +26,7 @@ A Strava-style ride tracker for horses and their riders. This is Checkpoint 3: l
 | Language / framework | Ruby 3.3.5, Ruby on Rails 8.1 |
 | Database | SQLite |
 | Frontend | ERB views, Hotwire (Turbo and Stimulus), import maps, Tailwind CSS 4 |
+| Photos | Active Storage on the server's disk, resized to WebP with libvips (`image_processing`) |
 | Maps | Leaflet 1.9.4 (from unpkg, with Subresource Integrity hashes) and OpenStreetMap tiles |
 | Web server | Puma behind nginx (HTTPS via Let's Encrypt and certbot) |
 | Hosting | AWS EC2, Ubuntu 24.04 |
@@ -34,6 +39,7 @@ A Strava-style ride tracker for horses and their riders. This is Checkpoint 3: l
 |---|---|---|
 | Ruby 3.3 or newer | [rbenv and ruby-build from git](https://github.com/rbenv/rbenv#basic-git-checkout), then `rbenv install 3.3.5` (Ubuntu's packaged Ruby and ruby-build are too old) | `brew install rbenv ruby-build`, then `rbenv install 3.3.5` |
 | C compiler and make | `sudo apt install build-essential libyaml-dev libssl-dev libffi-dev` | `xcode-select --install` |
+| libvips, for ride photos (`./start.sh` installs it if it can) | `sudo apt install libvips42t64 libheif-plugin-libde265` | `brew install vips` |
 | Google Chrome (browser tests only) | from google.com/chrome | from google.com/chrome |
 
 **Step 2: run it.**
@@ -86,7 +92,7 @@ sudo bash deploy/setup-ec2.sh --https   # --https: Let's Encrypt for trotter-app
 ./deploy/deploy.sh -h <PUBLIC-IP> -i landonquaintance-cs408.pem
 ```
 
-The site is then at `http://<PUBLIC-IP>/` and https://trotter-app.com. The database lives in `/opt/trotter/storage` on the server and are never overwritten by a deploy. The public IP changes if the instance is *stopped*, so keep EC2 stop protection on (reboots are fine).
+The site is then at `http://<PUBLIC-IP>/` and https://trotter-app.com. The database and uploaded ride photos live in `/opt/trotter/storage` on the server and are never overwritten by a deploy. The public IP changes if the instance is *stopped*, so keep EC2 stop protection on (reboots are fine).
 
 ### Everyday commands (on the server)
 

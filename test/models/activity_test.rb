@@ -1,6 +1,8 @@
 require "test_helper"
 
 class ActivityTest < ActiveSupport::TestCase
+  include ActiveJob::TestHelper
+
   # One degree of latitude on a sphere the size of the Earth
   METERS_PER_DEGREE = 2 * Math::PI * Activity::EARTH_RADIUS_METERS / 360
 
@@ -113,7 +115,95 @@ class ActivityTest < ActiveSupport::TestCase
     assert_in_delta 1609.344, ride.reload.distance_meters
   end
 
+  test "clearing every duration field on an existing ride is an error, not a silent no-change" do
+    ride = activities(:foothills)
+    ride.assign_attributes(duration_hours: "", duration_minutes: "", duration_seconds: "")
+
+    assert_not ride.valid?
+    assert_includes ride.errors.full_messages, "Duration can't be blank"
+  end
+
+  test "editing other details leaves the duration alone" do
+    ride = activities(:foothills)
+
+    ride.update!(title: "Foothills, the long way")
+    assert_equal 4800, ride.reload.duration
+  end
+
+  test "a ride can have JPEG, PNG, WebP, and HEIC photos" do
+    ride = new_ride(new_photos: [ photo("trail.jpg"), photo("pasture.png"), photo("iphone.heic") ])
+
+    assert ride.save, ride.errors.full_messages.to_sentence
+    assert_equal %w[ image/jpeg image/png image/heic ], ride.photos.map(&:content_type)
+  end
+
+  test "files that aren't photos are rejected" do
+    ride = new_ride(new_photos: [ photo("notes.txt", "text/plain") ])
+
+    assert_not ride.valid?
+    assert_equal [ "Photos must be JPEG, PNG, WebP, or HEIC images" ], ride.errors.full_messages
+  end
+
+  test "a ride can have at most 10 photos" do
+    ride = new_ride(new_photos: Array.new(11) { photo("trail.jpg") })
+
+    assert_not ride.valid?
+    assert_equal [ "Photos can't be more than 10" ], ride.errors.full_messages
+  end
+
+  test "photos over 20 MB are rejected" do
+    ride = new_ride(new_photos: [ photo("trail.jpg") ])
+    ride.validate
+    ride.photos.first.blob.byte_size = 21.megabytes
+
+    assert_not ride.valid?
+    assert_includes ride.errors.full_messages, "Photos must each be smaller than 20 MB"
+  end
+
+  test "adding photos keeps the ones already there, and removing one keeps the rest" do
+    ride = new_ride(new_photos: [ photo("trail.jpg") ])
+    ride.save!
+
+    ride.update!(new_photos: [ photo("pasture.png") ])
+    assert_equal %w[ trail.jpg pasture.png ], ride.reload.photos.map { |p| p.filename.to_s }
+
+    ride.update!(remove_photo_ids: [ ride.photos.first.id.to_s ])
+    assert_equal %w[ pasture.png ], ride.reload.photos.map { |p| p.filename.to_s }
+  end
+
+  test "another ride's photo can't be removed through this one" do
+    other = new_ride(new_photos: [ photo("trail.jpg") ])
+    other.save!
+    ride = new_ride(new_photos: [ photo("pasture.png") ])
+    ride.save!
+
+    ride.update!(remove_photo_ids: [ other.photos.first.id.to_s ])
+    assert_equal 1, other.reload.photos.count
+    assert_equal 1, ride.reload.photos.count
+  end
+
+  test "HEIC photos are converted to WebP for display" do
+    ride = new_ride(new_photos: [ photo("iphone.heic") ])
+    ride.save!
+
+    variant = ride.photos.first.variant(:preview).processed
+    assert_equal "image/webp", variant.image.blob.content_type
+  end
+
+  test "deleting a ride deletes its photos" do
+    ride = new_ride(new_photos: [ photo("trail.jpg") ])
+    ride.save!
+
+    assert_difference -> { ActiveStorage::Attachment.count } => -1, -> { ActiveStorage::Blob.count } => -1 do
+      perform_enqueued_jobs { ride.destroy! }
+    end
+  end
+
   private
+    def photo(name, type = nil)
+      Rack::Test::UploadedFile.new(file_fixture(name), type)
+    end
+
     def new_ride(**attributes)
       users(:rider).activities.new(title: "Test ride", started_at: 1.hour.ago, duration: 1800,
         route_coordinates: [ [ 0, 0 ], [ 0.01, 0 ] ], **attributes)
