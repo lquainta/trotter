@@ -50,6 +50,6 @@ class ActivitiesController < ApplicationController
     # route_coordinates arrives as a JSON string from the map; Activity#route_coordinates= parses it.
     def activity_params
       params.expect(activity: [ :title, :description, :started_at, :duration_hours, :duration_minutes, :duration_seconds,
-                                :route_coordinates, new_photos: [], remove_photo_ids: [] ])
+                                :route_coordinates, :horse_id, new_photos: [], remove_photo_ids: [] ])
     end
 end

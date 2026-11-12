@@ -1,0 +1,8 @@
+<%# A small card for a horse, on rider profiles. %>
+<%= link_to horse_path(horse), id: dom_id(horse), class: "card flex items-center gap-3 p-3 hover:border-amber-600 dark:hover:border-amber-600" do %>
+  <%= horse_photo horse, size: "size-14 text-2xl" %>
+  <span class="min-w-0">
+    <span class="block truncate font-semibold"><%= horse.name %></span>
+    <span class="block truncate text-sm text-stone-500 dark:text-stone-400"><%= horse_summary(horse).presence || "Horse" %></span>
+  </span>
+<% end %>

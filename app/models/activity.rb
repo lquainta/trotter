@@ -7,6 +7,7 @@ class Activity < ApplicationRecord
   MAX_PHOTO_SIZE = 20.megabytes
 
   belongs_to :user
+  belongs_to :horse, optional: true
 
   # Every photo is shown as a resized WebP, so iPhone HEIC photos display in any browser.
   # Deleting the ride deletes its photos too (has_many_attached purges them by default).
@@ -46,11 +47,12 @@ class Activity < ApplicationRecord
   validates :duration, numericality: { only_integer: true, greater_than: 0 }, allow_nil: true
   validate :route_is_drawn, if: :route_needs_checking?
   validate :photos_are_acceptable
+  validate :horse_belongs_to_rider
   # A broken route already has its own error, so don't pile a distance error on top of it.
   validates :distance_meters, numericality: { greater_than: 0 }, unless: -> { errors.include?(:route_coordinates) }
 
   scope :newest_first, -> { order(started_at: :desc) }
-  scope :with_photos_and_rider, -> { includes(:user, photos_attachments: :blob) }
+  scope :with_photos_and_rider, -> { includes(:user, :horse, photos_attachments: :blob) }
 
   # Length in meters of a route of [latitude, longitude] points, using the haversine formula.
   # app/javascript/lib/maps.js does the same math to show the distance while the route is drawn.
@@ -112,6 +114,11 @@ class Activity < ApplicationRecord
       self.photos = kept.map(&:blob) + uploads
       # Uploads are attached now; forget them so validating or saving again doesn't attach them twice.
       self.new_photos = []
+    end
+
+    # A form can't tie a ride to someone else's horse by sending its id.
+    def horse_belongs_to_rider
+      errors.add(:horse, "must be one of your horses") if horse && horse.user_id != user_id
     end
 
     def photos_are_acceptable

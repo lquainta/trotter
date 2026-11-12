@@ -12,6 +12,9 @@
         <p class="text-sm text-stone-500 dark:text-stone-400">
           <%= link_to @activity.user.username, user_path(@activity.user), class: "font-semibold text-stone-700 hover:underline dark:text-stone-200" %>
           &middot; <%= @activity.started_at.strftime("%A, %B %-d, %Y at %-l:%M %p") %>
+          <% if @activity.horse %>
+            &middot; on <%= link_to @activity.horse.name, horse_path(@activity.horse), class: "font-semibold text-amber-800 hover:underline dark:text-amber-400" %>
+          <% end %>
         </p>
       </div>
     </div>

@@ -25,6 +25,21 @@
   </dl>
 </section>
 
+<h2 class="mt-8 text-lg font-semibold"><%= own_profile ? "Your horses" : "Horses" %></h2>
+<% if @horses.empty? && !own_profile %>
+  <p class="mt-4 text-sm text-stone-500 dark:text-stone-400"><%= @user.username %> hasn't added any horses yet.</p>
+<% else %>
+  <div class="mt-4 grid gap-3 sm:grid-cols-2">
+    <%= render @horses %>
+    <% if own_profile %>
+      <%= link_to new_horse_path, class: "flex items-center gap-3 rounded-lg border border-dashed border-stone-300 p-3 text-stone-600 hover:border-amber-600 hover:text-amber-800 dark:border-stone-700 dark:text-stone-300 dark:hover:text-amber-400" do %>
+        <span class="inline-flex size-14 items-center justify-center rounded-full bg-stone-100 text-2xl dark:bg-stone-800" aria-hidden="true">+</span>
+        <span class="font-semibold">Add a horse</span>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>
+
 <h2 class="mt-8 text-lg font-semibold"><%= own_profile ? "Your rides" : "Rides" %></h2>
 
 <% if @activities.empty? %>

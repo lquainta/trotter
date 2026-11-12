@@ -1,0 +1,14 @@
+<% content_for :title, "Edit #{@horse.name_was} · Trotter" %>
+
+<h1 class="text-2xl font-bold">Edit <%= @horse.name_was %></h1>
+
+<%= render "form", horse: @horse %>
+
+<section class="card mt-6 border-red-200 p-6 dark:border-red-900">
+  <h2 class="text-lg font-semibold">Delete this horse</h2>
+  <p class="mt-1 text-sm text-stone-600 dark:text-stone-300">
+    <%= @horse.name_was %> and their photo are deleted for good. Their rides stay in your profile, but no longer list a horse.
+  </p>
+  <%= button_to "Delete horse", horse_path(@horse), method: :delete, class: "btn-danger mt-4",
+        form: { data: { turbo_confirm: "Delete #{@horse.name_was}? Their rides will stay, without a horse." } } %>
+</section>

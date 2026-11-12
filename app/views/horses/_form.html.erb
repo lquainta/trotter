@@ -1,0 +1,55 @@
+<%# The Add Horse and Edit Horse form. %>
+<%= form_with model: horse, class: "card mt-6 space-y-6 p-6" do |form| %>
+  <%= render "shared/form_errors", record: horse %>
+
+  <div>
+    <%= form.label :name, class: "form-label" %>
+    <%= form.text_field :name, required: true, maxlength: 50, placeholder: "Biscuit", class: "form-input" %>
+  </div>
+
+  <div class="grid gap-6 sm:grid-cols-3">
+    <div>
+      <%= form.label :breed, class: "form-label" %>
+      <%= form.text_field :breed, maxlength: 50, placeholder: "Quarter Horse", class: "form-input" %>
+    </div>
+    <div>
+      <%= form.label :color, class: "form-label" %>
+      <%= form.text_field :color, maxlength: 50, placeholder: "Bay", class: "form-input" %>
+    </div>
+    <div>
+      <%= form.label :birth_year, class: "form-label" %>
+      <%= form.number_field :birth_year, min: Horse::FIRST_BIRTH_YEAR, max: Date.current.year, placeholder: Date.current.year - 10,
+            class: "form-input tabular-nums" %>
+    </div>
+  </div>
+
+  <div>
+    <%= form.label :notes, class: "form-label" %>
+    <%= form.text_area :notes, rows: 3, maxlength: 1000, placeholder: "Temperament, training goals, favorite treats…", class: "form-input" %>
+  </div>
+
+  <fieldset>
+    <legend class="form-label">Photo</legend>
+    <% saved_photo = horse.persisted? && horse.attachment_changes["photo"].nil? && horse.photo.attached? %>
+    <% if saved_photo %>
+      <div class="mt-2 flex items-center gap-4">
+        <%= image_tag horse.photo.variant(:thumb), alt: "Photo of #{horse.name_was}",
+              class: "size-20 rounded-md border border-stone-200 object-cover dark:border-stone-800" %>
+        <label class="flex items-center gap-1.5 text-sm">
+          <%= form.check_box :remove_photo, class: "accent-red-700" %>
+          Remove photo
+        </label>
+      </div>
+    <% end %>
+    <%= form.label :photo, saved_photo ? "Replace photo" : "Add a photo", class: "sr-only" %>
+    <%= form.file_field :photo, accept: (Horse::PHOTO_CONTENT_TYPES + %w[ .heic .heif ]).join(","),
+          class: "mt-2 block w-full text-sm text-stone-600 file:mr-3 file:cursor-pointer file:rounded-md file:border-0 file:bg-stone-200 file:px-3 file:py-1.5 file:font-medium file:text-stone-800 hover:file:bg-stone-300 dark:text-stone-300 dark:file:bg-stone-700 dark:file:text-stone-100" %>
+    <p class="form-hint">JPEG, PNG, WebP, or iPhone HEIC, up to <%= Horse::MAX_PHOTO_SIZE / 1.megabyte %> MB.</p>
+  </fieldset>
+
+  <div class="flex items-center gap-4">
+    <%= form.submit horse.new_record? ? "Add horse" : "Save changes", class: "btn-primary" %>
+    <%= link_to "Cancel", horse.new_record? ? user_path(Current.user) : horse_path(horse),
+          class: "text-sm font-medium text-stone-600 hover:underline dark:text-stone-300" %>
+  </div>
+<% end %>

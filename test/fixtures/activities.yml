@@ -1,5 +1,6 @@
 foothills:
   user: rider
+  horse: biscuit
   title: Foothills loop
   description: Up the gulch and back along the ridge.
   started_at: <%= 1.day.ago %>

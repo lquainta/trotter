@@ -1,6 +1,6 @@
 # 🐴 Trotter
 
-A Strava-style ride tracker for horses and their riders. This is Checkpoint 4: ride pages, editing and deleting rides, and photos, on top of logging rides on a map (Checkpoint 3), accounts, profiles, and settings (Checkpoint 2), and the landing page and feed (Checkpoint 1). Horses and search arrive in later checkpoints.
+A Strava-style ride tracker for horses and their riders. This is Checkpoint 5: horses, with their own profiles and workload, on top of ride pages, editing, and photos (Checkpoint 4), logging rides on a map (Checkpoint 3), accounts, profiles, and settings (Checkpoint 2), and the landing page and feed (Checkpoint 1). Search arrives in a later checkpoint.
 
 **Live site:** https://trotter-app.com
 
@@ -14,6 +14,9 @@ A Strava-style ride tracker for horses and their riders. This is Checkpoint 4: r
 - **Photos**: up to 10 per ride (JPEG, PNG, WebP, or iPhone HEIC, 20 MB each), added when logging or editing a ride. Active Storage keeps them on the server's disk, and libvips resizes them and converts them to WebP so HEIC photos display in any browser. Feed cards show the first few.
 - **Edit Ride** (`/activities/:id/edit`): change any detail, redraw the route, add photos, or check photos to remove them. **Delete Ride** (on the ride page and Edit Ride) asks first and deletes the ride's photos too.
 - **Owner-only changes**: editing and deleting look the ride up through the logged-in rider, so anyone else gets "not found" and never sees Edit or Delete.
+- **Horses** (`/horses/new`, `/horses/:id/edit`): add, edit, and delete your horses, each with a name, breed, color, birth year, notes, and a photo (HEIC works too). Deleting a horse keeps its rides; they just no longer list a horse. Only the owner can edit or delete a horse; anyone else gets "not found".
+- **Choose a horse** when logging or editing a ride. Only your own horses are offered (and accepted). The feed and ride pages show which horse was ridden.
+- **Horse profiles** (`/horses/:id`): the horse's details and photo, its workload this week, this month, and all time (rides, distance, and time), a chart of distance per week for the last eight weeks, and its rides. Rider profiles list each rider's horses, and your own profile has an Add a horse card.
 - **Accounts** (`/registration/new`, `/session/new`): sign up, log in, and log out with a username and password (bcrypt via `has_secure_password`; 10 login attempts per 3 minutes).
 - **Rider profiles** (`/users/:username`) with each rider's total rides, distance, and time, and their rides.
 - **Settings** (`/settings`): light, dark, or system appearance; miles or kilometers; change password (logs out your other devices); log out; delete your account and rides (needs your password).

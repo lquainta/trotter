@@ -30,6 +30,19 @@
     <%= form.text_area :description, rows: 3, placeholder: "How did it go?", class: "form-input" %>
   </div>
 
+  <div>
+    <%= form.label :horse_id, "Horse", class: "form-label" %>
+    <% horses = activity.user.horses.by_name %>
+    <%= form.collection_select :horse_id, horses, :id, :name, { include_blank: "No horse" }, class: "form-input" %>
+    <p class="form-hint">
+      <% if horses.empty? %>
+        <%= link_to "Add a horse", new_horse_path, class: "text-amber-800 underline dark:text-amber-400" %> to track how much work it does.
+      <% else %>
+        The ride counts toward this horse's workload.
+      <% end %>
+    </p>
+  </div>
+
   <div class="grid gap-6 sm:grid-cols-2">
     <div>
       <%= form.label :started_at, "Start time", class: "form-label" %>

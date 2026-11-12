@@ -1,0 +1,85 @@
+<% content_for :title, "#{@horse.name} · Trotter" %>
+<% own_horse = @horse.user == Current.user %>
+
+<section class="card p-6">
+  <div class="flex flex-wrap items-start gap-5">
+    <%= horse_photo @horse, size: "size-28 text-5xl", variant: :profile %>
+    <div class="min-w-0 flex-1">
+      <h1 class="text-2xl font-bold"><%= @horse.name %></h1>
+      <% if horse_summary(@horse).present? %>
+        <p class="text-stone-600 dark:text-stone-300"><%= horse_summary(@horse) %></p>
+      <% end %>
+      <p class="mt-1 text-sm text-stone-500 dark:text-stone-400">
+        Ridden by <%= link_to @horse.user.username, user_path(@horse.user), class: "font-semibold text-stone-700 hover:underline dark:text-stone-200" %>
+      </p>
+    </div>
+    <% if own_horse %>
+      <%= link_to "Edit", edit_horse_path(@horse), class: "btn-secondary" %>
+    <% end %>
+  </div>
+
+  <% if @horse.notes.present? %>
+    <p class="mt-4 whitespace-pre-line text-stone-700 dark:text-stone-300"><%= @horse.notes %></p>
+  <% end %>
+</section>
+
+<section class="mt-8" aria-labelledby="workload">
+  <h2 id="workload" class="text-lg font-semibold">Workload</h2>
+  <div class="mt-4 grid gap-4 sm:grid-cols-3">
+    <% @workloads.each do |period, totals| %>
+      <div class="card p-4" id="workload-<%= period.parameterize %>">
+        <h3 class="text-sm font-semibold text-stone-500 uppercase dark:text-stone-400"><%= period %></h3>
+        <dl class="mt-2 grid grid-cols-3 gap-2">
+          <% { "Rides" => totals[:rides], "Distance" => format_distance(totals[:distance]),
+               "Time" => format_duration(totals[:duration]) }.each do |label, value| %>
+            <div>
+              <dt class="text-xs text-stone-500 dark:text-stone-400"><%= label %></dt>
+              <dd class="font-semibold tabular-nums"><%= value %></dd>
+            </div>
+          <% end %>
+        </dl>
+      </div>
+    <% end %>
+  </div>
+
+  <% most = @weekly_distances.map(&:last).max %>
+  <div class="card mt-4 p-4">
+    <h3 class="text-sm font-semibold text-stone-500 uppercase dark:text-stone-400">Distance per week</h3>
+    <ol class="mt-3 flex h-36 items-end gap-2" aria-label="Distance per week, last <%= @weekly_distances.size %> weeks">
+      <% @weekly_distances.each do |week, meters| %>
+        <li class="flex h-full flex-1 flex-col items-center justify-end gap-1">
+          <span class="text-xs tabular-nums text-stone-600 dark:text-stone-300">
+            <%= meters.positive? ? format_distance(meters).split.first : "" %>
+          </span>
+          <span class="w-full rounded-t bg-amber-600 dark:bg-amber-500"
+                style="height: <%= most.positive? ? (meters / most * 100).round : 0 %>%; min-height: 2px"
+                title="Week of <%= week.strftime("%b %-d") %>: <%= format_distance(meters) %>"></span>
+          <span class="text-xs text-stone-500 dark:text-stone-400"><%= week.strftime("%-m/%-d") %></span>
+          <span class="sr-only">Week of <%= week.strftime("%B %-d") %>: <%= format_distance(meters) %></span>
+        </li>
+      <% end %>
+    </ol>
+    <p class="form-hint mt-2">Distances in <%= current_distance_unit %>. Each bar is a week, starting Monday.</p>
+  </div>
+</section>
+
+<h2 class="mt-8 text-lg font-semibold">Rides on <%= @horse.name %></h2>
+<% if @activities.empty? %>
+  <p class="mt-4 rounded-lg border border-dashed border-stone-300 px-4 py-10 text-center text-stone-500 dark:border-stone-700 dark:text-stone-400">
+    No rides on <%= @horse.name %> yet.
+    <% if own_horse %>
+      Choose <%= @horse.name %> when you <%= link_to "log a ride", new_activity_path, class: "text-amber-800 underline dark:text-amber-400" %>.
+    <% end %>
+  </p>
+<% else %>
+  <div class="mt-4 space-y-4">
+    <%= render @activities %>
+  </div>
+<% end %>
+
+<% if own_horse %>
+  <div class="mt-8">
+    <%= button_to "Delete #{@horse.name}", horse_path(@horse), method: :delete, class: "btn-secondary text-red-700 dark:text-red-400",
+          form: { data: { turbo_confirm: "Delete #{@horse.name}? Their rides will stay, without a horse." } } %>
+  </div>
+<% end %>

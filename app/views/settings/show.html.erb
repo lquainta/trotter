@@ -72,11 +72,11 @@
 <section class="card mt-6 border-red-200 p-6 dark:border-red-900">
   <h2 class="text-lg font-semibold text-red-700 dark:text-red-400">Delete account</h2>
   <p class="mt-1 text-sm text-stone-600 dark:text-stone-400">
-    This permanently deletes your account and all of your rides. It can't be undone.
+    This permanently deletes your account and all of your rides, horses, and photos. It can't be undone.
   </p>
 
   <%= form_with scope: :user, url: settings_account_path, method: :delete, class: "mt-4 space-y-4 sm:w-2/3",
-        data: { turbo_confirm: "Delete your account and all of your rides? This can't be undone." } do |form| %>
+        data: { turbo_confirm: "Delete your account and all of your rides, horses, and photos? This can't be undone." } do |form| %>
     <div>
       <%= form.label :password_challenge, "Password", for: "delete_account_password", class: "form-label" %>
       <%= form.password_field :password_challenge, id: "delete_account_password", required: true, autocomplete: "current-password",

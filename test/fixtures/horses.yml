@@ -1,0 +1,11 @@
+biscuit:
+  user: rider
+  name: Biscuit
+  breed: Quarter Horse
+  color: Bay
+  birth_year: 2014
+  notes: Loves the hills.
+
+pepper:
+  user: km_rider
+  name: Pepper

@@ -292,6 +292,49 @@ class ActivitiesControllerTest < ActionDispatch::IntegrationTest
     assert_equal [ "trail.jpg" ], users(:newcomer).activities.last.photos.map { |p| p.filename.to_s }
   end
 
+  test "the ride form offers only your own horses" do
+    sign_in_as users(:rider)
+    get new_activity_path
+
+    assert_select "select[name=?]", "activity[horse_id]" do
+      assert_select "option", "No horse"
+      assert_select "option[value=?]", horses(:biscuit).id.to_s, text: "Biscuit"
+      assert_select "option[value=?]", horses(:pepper).id.to_s, count: 0
+    end
+  end
+
+  test "logging and editing a ride can choose a horse" do
+    sign_in_as users(:rider)
+
+    post activities_path, params: { activity: ride_params.merge(horse_id: horses(:biscuit).id) }
+    ride = users(:rider).activities.order(:id).last
+    assert_equal horses(:biscuit), ride.horse
+
+    get edit_activity_path(ride)
+    assert_select "option[selected][value=?]", horses(:biscuit).id.to_s
+
+    patch activity_path(ride), params: { activity: { horse_id: "" } }
+    assert_nil ride.reload.horse
+  end
+
+  test "a ride can't be logged on someone else's horse" do
+    sign_in_as users(:rider)
+
+    assert_no_difference "Activity.count" do
+      post activities_path, params: { activity: ride_params.merge(horse_id: horses(:pepper).id) }
+    end
+    assert_response :unprocessable_content
+    assert_select "li", "Horse must be one of your horses"
+  end
+
+  test "the feed and ride page show which horse was ridden" do
+    get activities_path
+    assert_select "##{dom_id(activities(:foothills))} a[href=?]", horse_path(horses(:biscuit)), text: "Biscuit"
+
+    get activity_path(activities(:foothills))
+    assert_select "a[href=?]", horse_path(horses(:biscuit)), text: "Biscuit"
+  end
+
   private
     def photo(name, type = nil)
       Rack::Test::UploadedFile.new(file_fixture(name), type)

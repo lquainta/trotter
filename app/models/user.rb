@@ -5,6 +5,7 @@ class User < ApplicationRecord
   has_secure_password
   has_many :sessions, dependent: :destroy
   has_many :activities, dependent: :destroy
+  has_many :horses, dependent: :destroy
 
   normalizes :username, with: ->(username) { username.strip.downcase }
 

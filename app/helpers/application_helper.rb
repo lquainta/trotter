@@ -21,6 +21,24 @@ module ApplicationHelper
   end
 
   # 9656 => "6.00 mi", or "9.66 km"
+  # A horse's photo, or a horse emoji in a circle when it has none.
+  def horse_photo(horse, size: "size-14 text-2xl", variant: :thumb)
+    if horse.photo.attached? && horse.photo.persisted?
+      image_tag horse.photo.variant(variant), alt: "Photo of #{horse.name}",
+        class: [ "shrink-0 rounded-full border border-stone-200 object-cover dark:border-stone-800", size ]
+    else
+      tag.span "🐴", aria: { hidden: true }, class: [
+        "inline-flex shrink-0 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-950", size
+      ]
+    end
+  end
+
+  # "Quarter Horse · Bay · 12 years old"
+  def horse_summary(horse)
+    age = horse.age && (horse.age.zero? ? "Foaled this year" : "#{pluralize(horse.age, "year")} old")
+    [ horse.breed, horse.color, age ].compact.join(" · ")
+  end
+
   def format_distance(meters, unit = current_distance_unit)
     "#{number_with_precision(meters / METERS_PER_UNIT[unit], precision: 2)} #{unit}"
   end

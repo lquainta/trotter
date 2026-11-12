@@ -38,3 +38,22 @@ creek_out = [ [ 38.10100, -84.60500 ], [ 38.10260, -84.60720 ], [ 38.10450, -84.
   activity.route_coordinates = ride[:route_coordinates] if activity.route_coordinates.blank?
   activity.save!
 end
+
+# Sample horses. A horse is only tied to sample rides the first time it's created, so a rider who
+# later changes a ride's horse (or deletes the horse) doesn't have it put back on the next deploy.
+[
+  { user: riders["demo"], name: "Biscuit", breed: "Quarter Horse", color: "Bay", birth_year: 2014,
+    notes: "Sure-footed on the foothills trails. Will do anything for a peppermint.",
+    rides: [ "Foothills loop", "Arena schooling" ] },
+  { user: riders["bluegrass_belle"], name: "Derby Day", breed: "Thoroughbred", color: "Chestnut", birth_year: 2016,
+    notes: "Off-track Thoroughbred, learning to love the trails.",
+    rides: [ "Morning hack around the farm", "Creek crossing practice" ] },
+  { user: riders["rotten_row"], name: "Earl Grey", breed: "Irish Draught", color: "Grey", birth_year: 2012,
+    notes: nil, rides: [ "Rotten Row, Hyde Park" ] }
+].each do |sample|
+  horse = sample[:user].horses.find_or_initialize_by(name: sample[:name])
+  next unless horse.new_record?
+
+  horse.update!(sample.except(:user, :rides))
+  sample[:user].activities.where(title: sample[:rides], horse_id: nil).update_all(horse_id: horse.id)
+end

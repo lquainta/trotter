@@ -13,6 +13,7 @@ Rails.application.routes.draw do
     resource :account, only: :destroy
   end
   resources :activities
+  resources :horses, except: :index
 
   root "pages#home"
 end
