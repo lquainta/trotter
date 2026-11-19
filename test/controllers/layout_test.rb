@@ -1,7 +1,7 @@
 require "test_helper"
 
 class LayoutTest < ActionDispatch::IntegrationTest
-  PAGES = -> { [ root_path, activities_path, activity_path(activities(:foothills)), user_path(users(:rider)), horse_path(horses(:biscuit)), new_session_path,
+  PAGES = -> { [ root_path, activities_path, activity_path(activities(:foothills)), user_path(users(:rider)), horse_path(horses(:biscuit)), search_path, new_session_path,
                  new_registration_path ] }
 
   test "every page has the same header and footer" do
@@ -10,8 +10,10 @@ class LayoutTest < ActionDispatch::IntegrationTest
 
       assert_select "body > header nav a[href=?]", root_path, 2
       assert_select "body > header nav a[href=?]", activities_path
+      assert_select "body > header nav a[href=?]", search_path, text: "Search"
       assert_select "body > footer a[href=?]", root_path
       assert_select "body > footer a[href=?]", activities_path
+      assert_select "body > footer a[href=?]", search_path, text: "Search"
       assert_select "body > footer a[href=?]", new_activity_path
       assert_select "body > footer a[href=?]", "https://github.com/lquainta/trotter"
       assert_select "body > footer a[href=?]", "http://54.244.82.148/", text: "PolymareKit"

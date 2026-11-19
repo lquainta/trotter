@@ -75,4 +75,27 @@ module ApplicationHelper
     per_hour = meters / METERS_PER_UNIT[unit] / (seconds / 3600.0)
     "#{number_with_precision(per_hour, precision: 1)} #{unit == "mi" ? "mph" : "km/h"}"
   end
+
+  # A small SVG outline of a ride's route, for search results, where a full map per ride would be slow.
+  # Longitude is scaled by cos(latitude) so the shape isn't stretched sideways.
+  def route_outline(points, size: 64, label: "Route outline")
+    return tag.span(class: "block shrink-0 rounded-md bg-stone-100 dark:bg-stone-800", style: "width: #{size}px; height: #{size}px") if points.blank? || points.size < 2
+
+    mid_lat = points.sum(&:first) / points.size * Math::PI / 180
+    xy = points.map { |lat, lng| [ lng * Math.cos(mid_lat), -lat ] }
+    min_x, max_x = xy.map(&:first).minmax
+    min_y, max_y = xy.map(&:last).minmax
+    span = [ max_x - min_x, max_y - min_y, 1e-9 ].max
+    pad = 8.0
+    scale = (100 - 2 * pad) / span
+    offset_x = pad + (100 - 2 * pad - (max_x - min_x) * scale) / 2
+    offset_y = pad + (100 - 2 * pad - (max_y - min_y) * scale) / 2
+    coordinates = xy.map { |x, y| format("%.1f,%.1f", offset_x + (x - min_x) * scale, offset_y + (y - min_y) * scale) }.join(" ")
+
+    tag.svg(viewBox: "0 0 100 100", width: size, height: size, role: "img", aria: { label: label },
+            class: "shrink-0 rounded-md bg-amber-50 text-amber-700 dark:bg-stone-800 dark:text-amber-500") do
+      tag.polyline(points: coordinates, fill: "none", stroke: "currentColor", "stroke-width": 4,
+                   "stroke-linecap": "round", "stroke-linejoin": "round")
+    end
+  end
 end

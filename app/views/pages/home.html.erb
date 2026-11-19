@@ -13,6 +13,7 @@
         <%= link_to "Sign up", new_registration_path, class: "btn-primary" %>
       <% end %>
       <%= link_to "Browse the feed", activities_path, class: "btn-secondary px-4 py-2 text-base" %>
+      <%= link_to "Search rides", search_path, class: "btn-secondary px-4 py-2 text-base" %>
     </div>
   </div>
 </section>
@@ -33,7 +34,8 @@
     <li class="card p-4">
       <p class="font-semibold">3. Share it</p>
       <p class="mt-1 text-sm text-stone-600 dark:text-stone-300">
-        Your ride shows up in the <%= link_to "feed", activities_path, class: "text-amber-800 underline dark:text-amber-400" %> for everyone to see.
+        Your ride shows up in the <%= link_to "feed", activities_path, class: "text-amber-800 underline dark:text-amber-400" %> for everyone to see, and anyone can
+        <%= link_to "search", search_path, class: "text-amber-800 underline dark:text-amber-400" %> for it.
       </p>
     </li>
   </ol>

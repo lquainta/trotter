@@ -1,6 +1,6 @@
 # 🐴 Trotter
 
-A Strava-style ride tracker for horses and their riders. This is Checkpoint 5: horses, with their own profiles and workload, on top of ride pages, editing, and photos (Checkpoint 4), logging rides on a map (Checkpoint 3), accounts, profiles, and settings (Checkpoint 2), and the landing page and feed (Checkpoint 1). Search arrives in a later checkpoint.
+A Strava-style ride tracker for horses and their riders. This is Checkpoint 6: search, on top of horses with their own profiles and workload (Checkpoint 5), ride pages, editing, and photos (Checkpoint 4), logging rides on a map (Checkpoint 3), accounts, profiles, and settings (Checkpoint 2), and the landing page and feed (Checkpoint 1).
 
 **Live site:** https://trotter-app.com
 
@@ -17,6 +17,7 @@ A Strava-style ride tracker for horses and their riders. This is Checkpoint 5: h
 - **Horses** (`/horses/new`, `/horses/:id/edit`): add, edit, and delete your horses, each with a name, breed, color, birth year, notes, and a photo (HEIC works too). Deleting a horse keeps its rides; they just no longer list a horse. Only the owner can edit or delete a horse; anyone else gets "not found".
 - **Choose a horse** when logging or editing a ride. Only your own horses are offered (and accepted). The feed and ride pages show which horse was ridden.
 - **Horse profiles** (`/horses/:id`): the horse's details and photo, its workload this week, this month, and all time (rides, distance, and time), a chart of distance per week for the last eight weeks, and its rides. Rider profiles list each rider's horses, and your own profile has an Add a horse card.
+- **Search** (`/search`, everyone): filter rides by keyword (title or description), rider, horse, distance (in your units), date range, and whether they have photos, sorted newest, oldest, longest, or fastest. It's a GET form, so every search has a shareable URL like `/search?q=foothills&min_distance=1&sort=longest`. An empty search shows a prompt with example searches instead of every ride, and results come 10 per page with Previous and Next links. Each filter is an Active Record scope on `Activity`, chained together in `ActivitySearch`, with values passed as bound parameters (never pasted into SQL). Each result shows a small SVG outline of its route instead of a full map, so a page of results loads quickly.
 - **Accounts** (`/registration/new`, `/session/new`): sign up, log in, and log out with a username and password (bcrypt via `has_secure_password`; 10 login attempts per 3 minutes).
 - **Rider profiles** (`/users/:username`) with each rider's total rides, distance, and time, and their rides.
 - **Settings** (`/settings`): light, dark, or system appearance; miles or kilometers; change password (logs out your other devices); log out; delete your account and rides (needs your password).
@@ -53,7 +54,7 @@ cd trotter
 ./start.sh
 ```
 
-`start.sh` checks the tools above, installs the Ruby gems, creates the SQLite database with sample riders and rides (log in as `demo` / `password123`), builds the CSS, and starts the app at **http://localhost:3000**. It's safe to run again. Use `./start.sh --port 4000` for another port.
+`start.sh` checks the tools above, installs the Ruby gems, creates the SQLite database with sample riders, horses, and a dozen rides (log in as `demo` / `password123`), builds the CSS, and starts the app at **http://localhost:3000**. It's safe to run again. Use `./start.sh --port 4000` for another port.
 
 For development with automatic CSS rebuilding, use `bin/dev` instead.
 

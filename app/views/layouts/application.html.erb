@@ -31,8 +31,10 @@
         <%= link_to "🐴 Trotter", root_path, class: "text-xl font-bold tracking-tight text-amber-800 dark:text-amber-500" %>
 
         <div class="flex items-center gap-3 text-sm font-medium sm:gap-4">
-          <%= link_to "Home", root_path, class: "text-stone-600 hover:text-stone-900 dark:text-stone-300 dark:hover:text-white" %>
+          <%# On phones the logo is the Home link, leaving room for Search. %>
+          <%= link_to "Home", root_path, class: "hidden text-stone-600 hover:text-stone-900 sm:inline dark:text-stone-300 dark:hover:text-white" %>
           <%= link_to "Feed", activities_path, class: "text-stone-600 hover:text-stone-900 dark:text-stone-300 dark:hover:text-white" %>
+          <%= link_to "Search", search_path, class: "text-stone-600 hover:text-stone-900 dark:text-stone-300 dark:hover:text-white" %>
 
           <% if authenticated? %>
             <%= link_to "Log a Ride", new_activity_path, class: "whitespace-nowrap text-stone-600 hover:text-stone-900 dark:text-stone-300 dark:hover:text-white" %>
@@ -71,6 +73,7 @@
         <nav aria-label="Footer" class="flex flex-wrap gap-x-4 gap-y-2">
           <%= link_to "Home", root_path, class: "hover:text-stone-900 dark:hover:text-white" %>
           <%= link_to "Feed", activities_path, class: "hover:text-stone-900 dark:hover:text-white" %>
+          <%= link_to "Search", search_path, class: "hover:text-stone-900 dark:hover:text-white" %>
           <%= link_to "Log a Ride", new_activity_path, class: "hover:text-stone-900 dark:hover:text-white" %>
           <%= link_to "GitHub", "https://github.com/lquainta/trotter", class: "hover:text-stone-900 dark:hover:text-white" %>
           <%= link_to "PolymareKit", "http://54.244.82.148/", class: "hover:text-stone-900 dark:hover:text-white" %>

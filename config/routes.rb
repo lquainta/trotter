@@ -14,6 +14,7 @@ Rails.application.routes.draw do
   end
   resources :activities
   resources :horses, except: :index
+  get "search" => "searches#show", as: :search
 
   root "pages#home"
 end

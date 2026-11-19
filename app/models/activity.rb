@@ -54,6 +54,29 @@ class Activity < ApplicationRecord
   scope :newest_first, -> { order(started_at: :desc) }
   scope :with_photos_and_rider, -> { includes(:user, :horse, photos_attachments: :blob) }
 
+  # Search filters (see ActivitySearch). Each one is a small scope so they chain and the database
+  # does the filtering. Values always go to the database as bound parameters, never pasted into SQL.
+  scope :matching, ->(keyword) {
+    pattern = "%#{sanitize_sql_like(keyword)}%"
+    where("activities.title LIKE :pattern OR activities.description LIKE :pattern", pattern: pattern)
+  }
+  scope :by_rider, ->(username) { joins(:user).where(users: { username: username.to_s.strip.downcase }) }
+  scope :on_horse, ->(horse_id) { where(horse_id: horse_id) }
+  # Meters; either end can be nil for "no minimum" or "no maximum".
+  scope :distance_between, ->(min, max) { where(distance_meters: min..max) }
+  # Dates, inclusive; either end can be nil.
+  scope :started_between, ->(from, to) { where(started_at: from&.beginning_of_day..to&.end_of_day) }
+  scope :with_photos, -> {
+    where(ActiveStorage::Attachment.where(record_type: name, name: "photos").where("record_id = activities.id").arel.exists)
+  }
+  SORTS = {
+    "newest" => { started_at: :desc },
+    "oldest" => { started_at: :asc },
+    "longest" => { distance_meters: :desc, started_at: :desc },
+    "fastest" => [ Arel.sql("activities.distance_meters / activities.duration DESC"), { started_at: :desc } ]
+  }.freeze
+  scope :sorted_by, ->(sort) { order(*Array.wrap(SORTS.fetch(sort, SORTS["newest"]))).order(id: :desc) }
+
   # Length in meters of a route of [latitude, longitude] points, using the haversine formula.
   # app/javascript/lib/maps.js does the same math to show the distance while the route is drawn.
   def self.route_distance(points)
