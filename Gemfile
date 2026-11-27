@@ -38,7 +38,7 @@ gem "kamal", require: false
 gem "thruster", require: false
 
 # Ride photos: Active Storage resizes them and converts them to WebP with libvips [https://www.libvips.org]
-gem "image_processing", "~> 2.1"
+gem "image_processing", "~> 2.2"
 gem "ruby-vips", "~> 2.2", require: false # Active Storage loads it when it needs it
 
 
